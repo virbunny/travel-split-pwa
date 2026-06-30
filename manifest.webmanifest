@@ -1,12 +1,12 @@
 {
   "name": "米兔旅伴分帳小幫手",
   "short_name": "旅伴分帳",
-  "description": "旅行用多人分帳 PWA，支援行程、現金池、四幣別、收據票券連結與 JSON 備份。",
+  "description": "旅行用多人分帳 PWA，支援行程、現金池、四幣別、收據票券連結、JSON 備份，採旅行箱綠粉主題。",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8f5ff",
-  "theme_color": "#6d28d9",
+  "background_color": "#f5f8e9",
+  "theme_color": "#8aa84a",
   "lang": "zh-Hant-TW",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
