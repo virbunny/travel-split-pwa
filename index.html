@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔旅伴分帳小幫手 V1.2</title>
+  <title>米兔分帳小幫手 V1.2.4</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -15,55 +15,56 @@
     :root{
       --bg:#f5f8e9; --card:#fffefb; --ink:#35401d; --muted:#6f7e58; --line:#d9e5bb;
       --brand:#8aa84a; --brand2:#5f742b; --soft:#edf4d7; --soft2:#fafcf1;
+      --accent:#b7dff0; --accent2:#e8f6fb; --accent3:#4f89a3;
       --danger:#b4534c; --ok:#4f7b35; --warn:#a8791f; --blue:#51798b;
       --shadow:0 10px 24px rgba(104,130,61,.12); --radius:18px; --tap:44px;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.5}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 12% 0%,rgba(232,246,251,.78),transparent 28%),radial-gradient(circle at 92% 12%,rgba(255,225,233,.52),transparent 24%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.5}
     button,input,select,textarea{font:inherit}
     button{cursor:pointer;touch-action:manipulation}
     .app{max-width:1060px;margin:0 auto;padding:14px 14px 98px}
-    header.hero{position:sticky;top:0;z-index:20;margin:0 -14px 12px;padding:12px 14px 10px;background:linear-gradient(180deg,#f5f8e9 88%,rgba(245,248,233,0));backdrop-filter:blur(12px)}
-    .titlebar{display:flex;gap:12px;align-items:center;justify-content:space-between}.brandbox{display:flex;gap:12px;align-items:center}.app-logo{width:56px;height:56px;border-radius:18px;border:1px solid var(--line);box-shadow:0 6px 16px rgba(104,130,61,.14);background:#f9fceb;flex:none}
-    h1{font-size:1.26rem;margin:0;font-weight:950;letter-spacing:.02em;color:var(--brand2)}
-    .version{font-size:.75rem;color:#9a7a15;background:#fff6dd;border:1px solid #efdf9e;border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:900}
+    header.hero{position:sticky;top:0;z-index:20;margin:0 -14px 12px;padding:12px 14px 10px;background:linear-gradient(180deg,#f7f9ed 72%,rgba(232,246,251,.78) 100%,rgba(245,248,233,0));backdrop-filter:blur(12px)}
+    .titlebar{display:flex;gap:12px;align-items:center;justify-content:space-between}.brandbox{display:flex;gap:12px;align-items:center}.app-logo{width:56px;height:56px;border-radius:18px;border:1px solid var(--accent2);box-shadow:0 6px 16px rgba(79,137,163,.16);background:transparent;flex:none}
+    h1{font-size:1.26rem;margin:0;font-weight:950;letter-spacing:.02em;color:var(--brand2)}h1::after{content:" ✦";color:var(--accent3);font-size:.86em}
+    .version{font-size:.75rem;color:var(--accent3);background:var(--accent2);border:1px solid var(--accent);border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:900}
     .subtitle{margin:4px 0 0;color:var(--muted);font-size:.9rem}
     .tripbar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:10px}
     .statusbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 0}
-    .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 10px;box-shadow:0 4px 14px rgba(104,130,61,.08)}
+    .stat{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:9px 10px;box-shadow:0 4px 14px rgba(104,130,61,.08)}
     .stat .label{font-size:.75rem;color:var(--muted)}
     .stat .value{font-weight:950;font-size:1rem;margin-top:1px;color:var(--brand2)}
-    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,251,.97);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(104,130,61,.12)}
+    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,251,.97);border-top:2px solid var(--accent2);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(104,130,61,.12)}
     .tabs-inner{width:min(1060px,100%);margin:0 auto;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
     .tabs-inner::-webkit-scrollbar{display:none}
     .tab-btn{min-width:72px;min-height:var(--tap);border:0;border-radius:14px;background:transparent;color:var(--muted);font-weight:900;font-size:.78rem;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;white-space:nowrap}
-    .tab-btn.active{background:var(--soft);color:var(--brand2)}
+    .tab-btn.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);box-shadow:inset 0 0 0 1px rgba(79,137,163,.35)}
     .tab-btn span:first-child{font-size:1.05rem;line-height:1}
     .page{display:none;animation:fade .15s ease-out}.page.active{display:block}
     @keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0;box-shadow:var(--shadow)}
-    .card h2{font-size:1.05rem;margin:0 0 10px;color:var(--brand2)}
+    .card{background:linear-gradient(180deg,#fffefb 0%,#fff 100%);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0;box-shadow:var(--shadow)}
+    .card h2{font-size:1.05rem;margin:0 0 10px;color:var(--brand2)}.card h2::before{content:"▸ ";color:var(--accent3)}
     .card h3{font-size:.96rem;margin:14px 0 8px;color:#5c6f2d}.hint{font-size:.86rem;color:var(--muted);margin:6px 0 0}
-    .note{font-size:.88rem;color:#63734c;background:#f3f8e7;border:1px solid #dce9bf;border-radius:14px;padding:10px;margin:10px 0}
+    .note{font-size:.88rem;color:#63734c;background:linear-gradient(90deg,var(--accent2),#f3f8e7 46%);border:1px solid #dce9bf;border-left:5px solid var(--accent);border-radius:14px;padding:10px;margin:10px 0}
     .warn{font-size:.88rem;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:10px;margin:10px 0}
     .grid{display:grid;gap:10px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}
     label{display:block;font-size:.85rem;font-weight:900;color:#536336;margin:0 0 5px}
     input,select,textarea{width:100%;min-height:var(--tap);border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:10px 11px;outline:none}
-    textarea{min-height:72px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(138,168,74,.18)}
+    textarea{min-height:72px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,137,163,.22)}
     .row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grow{flex:1}
-    .btn{min-height:var(--tap);border:0;border-radius:14px;background:var(--brand);color:white;font-weight:950;padding:10px 14px;box-shadow:0 8px 16px rgba(138,168,74,.22)}
-    .btn.secondary{background:#fff;color:var(--brand2);border:1px solid var(--line);box-shadow:none}.btn.danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca;box-shadow:none}.btn.ok{background:#dcfce7;color:var(--ok);border:1px solid #bbf7d0;box-shadow:none}.btn.full{width:100%}.btn.small{min-height:36px;border-radius:12px;padding:7px 10px;font-size:.84rem}
-    .pillbox{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#453957;font-weight:900}.pill input{width:auto;min-height:0;accent-color:var(--brand)}.pill.active{background:var(--soft);border-color:#c8dba0;color:var(--brand2)}
-    .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg button{box-shadow:none;background:#fff;color:var(--muted);border:1px solid var(--line)}.seg button.active{background:var(--soft);color:var(--brand2);border-color:#c8dba0}
+    .btn{min-height:var(--tap);border:0;border-radius:14px;background:linear-gradient(135deg,var(--brand),#9fba5d);color:white;font-weight:950;padding:10px 14px;box-shadow:0 8px 16px rgba(138,168,74,.20),0 2px 8px rgba(79,137,163,.16)}
+    .btn.secondary{background:#fff;color:var(--brand2);border:1px solid var(--accent2);box-shadow:none}.btn.danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca;box-shadow:none}.btn.ok{background:#dcfce7;color:var(--ok);border:1px solid #bbf7d0;box-shadow:none}.btn.full{width:100%}.btn.small{min-height:36px;border-radius:12px;padding:7px 10px;font-size:.84rem}
+    .pillbox{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#3f4d22;font-weight:900}.pill input{width:auto;min-height:0;accent-color:var(--brand)}.pill.active{background:linear-gradient(135deg,var(--soft),var(--accent2));border-color:var(--accent);color:var(--brand2)}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg button{box-shadow:none;background:#fff;color:var(--muted);border:1px solid var(--line)}.seg button.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);border-color:var(--accent)}
     .empty{border:1px dashed #c6d5a7;border-radius:16px;padding:18px;text-align:center;color:var(--muted);background:rgba(255,255,255,.6)}
     .list{display:grid;gap:9px}.item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:11px;display:grid;gap:8px}.item-top{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.item-title{font-weight:950;color:#3f4d22;word-break:break-word}.item-meta{font-size:.84rem;color:var(--muted);word-break:break-word}.money{font-weight:950;color:var(--brand2);white-space:nowrap}.right{text-align:right}.link{color:var(--blue);font-weight:900;text-decoration:none;word-break:break-all}.link:hover{text-decoration:underline}
     .summary-grid{display:grid;gap:10px}.balance{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}.balance .name{font-weight:950}.balance .desc{font-size:.82rem;color:var(--muted)}.plus{color:var(--ok)}.minus{color:var(--danger)}.zero{color:var(--muted)}
-    .settle{border-left:5px solid var(--brand);background:#fff;border-radius:16px;padding:12px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.settle strong{color:var(--brand2)}
-    .currency-block{background:var(--soft2);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.currency-title{font-weight:950;color:var(--brand2);margin-bottom:8px}
-    .badge{display:inline-flex;align-items:center;border-radius:999px;background:#f5f7ee;border:1px solid #dde6c8;color:#687255;font-size:.76rem;font-weight:900;padding:2px 8px;white-space:nowrap}.badge.pool{background:#eef6e5;border-color:#d2e6b4;color:#617b2e}.badge.person{background:#fff8de;border-color:#ecd99b;color:#8a6a21}
+    .settle{border-left:5px solid var(--accent3);background:#fff;border-radius:16px;padding:12px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.settle strong{color:var(--brand2)}
+    .currency-block{background:var(--soft2);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.currency-title{font-weight:950;color:var(--brand2);margin-bottom:8px}.currency-title::after{content:"  ✦";color:var(--accent3)}
+    .badge{display:inline-flex;align-items:center;border-radius:999px;background:#f5f7ee;border:1px solid #dde6c8;color:#687255;font-size:.76rem;font-weight:900;padding:2px 8px;white-space:nowrap}.badge.pool{background:#eef6e5;border-color:#d2e6b4;color:#617b2e}.badge.person{background:var(--accent2);border-color:var(--accent);color:var(--accent3)}
     table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:.78rem;text-align:left;color:var(--muted);font-weight:950;padding:0 8px}td{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px}td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}
-    .toast{position:fixed;left:14px;right:14px;bottom:88px;z-index:50;max-width:640px;margin:0 auto;background:#241f2f;color:white;border-radius:16px;padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.22);display:none}.toast.show{display:block;animation:fade .12s ease-out}
-    @media (min-width:760px){.app{padding-bottom:28px}.tabs{position:sticky;top:82px;bottom:auto;margin:0 auto 12px;padding:0;background:transparent;border:0;box-shadow:none}.tabs-inner{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;padding:6px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(7,1fr)}.tab-btn{min-width:0;font-size:.88rem;flex-direction:row;gap:6px}.statusbar{grid-template-columns:repeat(4,1fr)}.summary-grid{grid-template-columns:1fr 1fr}}
+    .toast{position:fixed;left:14px;right:14px;bottom:88px;z-index:50;max-width:640px;margin:0 auto;background:#4e5d27;color:white;border-radius:16px;padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.22);display:none}.toast.show{display:block;animation:fade .12s ease-out}
+    @media (min-width:760px){.app{padding-bottom:28px}.tabs{position:sticky;top:82px;bottom:auto;margin:0 auto 12px;padding:0;background:transparent;border:0;box-shadow:none}.tabs-inner{background:rgba(255,255,255,.92);border:1px solid var(--accent2);border-radius:18px;padding:6px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(7,1fr)}.tab-btn{min-width:0;font-size:.88rem;flex-direction:row;gap:6px}.statusbar{grid-template-columns:repeat(4,1fr)}.summary-grid{grid-template-columns:1fr 1fr}}
     @media (max-width:620px){.grid.two,.grid.three,.grid.four{grid-template-columns:1fr}.tripbar{grid-template-columns:1fr}.statusbar{grid-template-columns:1fr 1fr}h1{font-size:1.14rem}.version{font-size:.7rem}.hide-mobile{display:none}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:600px}.item-top{align-items:flex-start}.right{text-align:left}}
     @media print{body{background:#fff;color:#000}header.hero,.tabs,.no-print,.toast{display:none!important}.app{max-width:none;padding:0}.page{display:block!important}.card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}button,input,select,textarea{display:none!important}a{color:#000}}
   </style>
@@ -75,11 +76,11 @@
         <div class="brandbox">
           <img class="app-logo" src="icons/icon-192.png" alt="米兔分帳圖示">
           <div>
-            <h1>米兔旅伴分帳小幫手</h1>
+            <h1>米兔分帳小幫手</h1>
             <p class="subtitle">用行程分開管理，原幣別記帳，最後分幣別結算。</p>
           </div>
         </div>
-        <div class="version">V1.2</div>
+        <div class="version">V1.2.4</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -277,7 +278,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[]});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔旅伴分帳小幫手',version:'1.1',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.2.4',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
 
@@ -321,14 +322,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔旅伴分帳小幫手',version:'1.1',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.2.4',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔旅伴分帳小幫手',version:'1.1',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.2.4',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -338,6 +339,17 @@
     let t = state.trips.find(x=>x.id===state.currentTripId);
     if(!t){ t = state.trips[0] || makeTrip('新行程'); state.trips = [t]; state.currentTripId = t.id; }
     return t;
+  }
+  function deleteTripById(id){
+    if(state.trips.length<=1) return toast('至少要保留一個行程');
+    const target = state.trips.find(x=>x.id===id);
+    if(!target) return toast('找不到這個行程');
+    const msg = `確定刪除「${target.name}」？\n這會一起刪除該行程的旅伴、支出、現金池與連結。`;
+    if(!confirm(msg)) return;
+    state.trips = state.trips.filter(x=>x.id!==id);
+    if(state.currentTripId===id) state.currentTripId = state.trips[0].id;
+    saveState();
+    toast('已刪除行程');
   }
   function personName(id, t=trip()){ return t.people.find(p=>p.id===id)?.name || '已刪除旅伴'; }
   function money(value,currency='TWD'){
@@ -444,10 +456,12 @@
       const isCurrent = t.id===state.currentTripId;
       const btn = el('button',{class:isCurrent?'btn small':'btn secondary small',text:isCurrent?'使用中':'切換'});
       btn.addEventListener('click',()=>{state.currentTripId=t.id; saveState(); toast('已切換行程');});
+      const del = el('button',{class:'btn danger small',text:'刪除'});
+      del.addEventListener('click',()=>deleteTripById(t.id));
       box.append(el('div',{class:'item'},[
         el('div',{class:'item-top'},[
           el('div',{},[el('div',{class:'item-title',text:t.name}), el('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})]),
-          btn
+          el('div',{class:'row'},[btn,del])
         ])
       ]));
     });
@@ -578,7 +592,7 @@
   function resetLinkForm(){ $('linkDate').value=todayISO(); $('linkTitle').value=''; $('linkUrl').value=''; $('linkNote').value=''; $('linkType').value='收據'; }
   function exportJSON(data, filename){ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
   function settlementText(){
-    const t=trip(); const c=compute(t); const lines=[`【${t.name}｜米兔旅伴分帳結算】`,''];
+    const t=trip(); const c=compute(t); const lines=[`【${t.name}｜米兔分帳結算】`,''];
     let any=false;
     Object.entries(currencies).forEach(([cur,info])=>{
       const list=c.settlements[cur]||[]; const shortage=c.poolShortage[cur]||0;
@@ -614,8 +628,8 @@
   $('copySettlementBtn').addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
   $('exportAllBtn').addEventListener('click',()=>exportJSON(state,`米兔分帳全部行程_${todayISO()}.json`));
   $('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},`米兔分帳_${trip().name}_${todayISO()}.json`));
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔旅伴分帳小幫手',version:'1.1',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
-  $('deleteTripBtn').addEventListener('click',()=>{ if(state.trips.length<=1) return toast('至少要保留一個行程'); const t=trip(); if(confirm(`確定刪除「${t.name}」？`)){ state.trips=state.trips.filter(x=>x.id!==t.id); state.currentTripId=state.trips[0].id; saveState(); toast('已刪除行程'); } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.2.4',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 
   if('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));
