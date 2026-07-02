@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.2.4</title>
+  <title>米兔分帳小幫手 V1.2.5</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -51,7 +51,7 @@
     label{display:block;font-size:.85rem;font-weight:900;color:#536336;margin:0 0 5px}
     input,select,textarea{width:100%;min-height:var(--tap);border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:10px 11px;outline:none}
     textarea{min-height:72px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,137,163,.22)}
-    .row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grow{flex:1}
+    .row{display:flex;gap:8px;align-items:center}.row.wrap{flex-wrap:wrap}.row>*{min-width:0}.grow{flex:1}.trip-name-input{font-weight:950;color:var(--brand2)}
     .btn{min-height:var(--tap);border:0;border-radius:14px;background:linear-gradient(135deg,var(--brand),#9fba5d);color:white;font-weight:950;padding:10px 14px;box-shadow:0 8px 16px rgba(138,168,74,.20),0 2px 8px rgba(79,137,163,.16)}
     .btn.secondary{background:#fff;color:var(--brand2);border:1px solid var(--accent2);box-shadow:none}.btn.danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca;box-shadow:none}.btn.ok{background:#dcfce7;color:var(--ok);border:1px solid #bbf7d0;box-shadow:none}.btn.full{width:100%}.btn.small{min-height:36px;border-radius:12px;padding:7px 10px;font-size:.84rem}
     .pillbox{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#3f4d22;font-weight:900}.pill input{width:auto;min-height:0;accent-color:var(--brand)}.pill.active{background:linear-gradient(135deg,var(--soft),var(--accent2));border-color:var(--accent);color:var(--brand2)}
@@ -80,7 +80,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，最後分幣別結算。</p>
           </div>
         </div>
-        <div class="version">V1.2.4</div>
+        <div class="version">V1.2.5</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -278,7 +278,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[]});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.2.4',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.2.5',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
 
@@ -322,14 +322,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.2.4',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.2.5',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.2.4',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.2.5',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -454,14 +454,29 @@
     const box=$('tripList'); box.innerHTML='';
     state.trips.forEach(t => {
       const isCurrent = t.id===state.currentTripId;
+      const input = el('input',{class:'trip-name-input',type:'text',value:t.name,'aria-label':'行程名稱'});
+      const saveName = el('button',{class:'btn secondary small',text:'儲存名稱'});
+      const commitName = () => {
+        const name = input.value.trim();
+        if(!name){ input.value=t.name; return toast('行程名稱不可空白'); }
+        if(name===t.name) return toast('名稱沒有變更');
+        t.name = name;
+        saveState();
+        toast('已更新行程名稱');
+      };
+      input.addEventListener('keydown',e=>{ if(e.key==='Enter') commitName(); });
+      saveName.addEventListener('click',commitName);
       const btn = el('button',{class:isCurrent?'btn small':'btn secondary small',text:isCurrent?'使用中':'切換'});
       btn.addEventListener('click',()=>{state.currentTripId=t.id; saveState(); toast('已切換行程');});
       const del = el('button',{class:'btn danger small',text:'刪除'});
       del.addEventListener('click',()=>deleteTripById(t.id));
       box.append(el('div',{class:'item'},[
         el('div',{class:'item-top'},[
-          el('div',{},[el('div',{class:'item-title',text:t.name}), el('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})]),
-          el('div',{class:'row'},[btn,del])
+          el('div',{class:'grow'},[
+            input,
+            el('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})
+          ]),
+          el('div',{class:'row wrap'},[btn,saveName,del])
         ])
       ]));
     });
@@ -628,7 +643,7 @@
   $('copySettlementBtn').addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
   $('exportAllBtn').addEventListener('click',()=>exportJSON(state,`米兔分帳全部行程_${todayISO()}.json`));
   $('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},`米兔分帳_${trip().name}_${todayISO()}.json`));
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.2.4',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.2.5',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 
