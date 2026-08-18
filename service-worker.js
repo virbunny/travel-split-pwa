@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-2-7-home-ledger';
+const CACHE_NAME = 'mitu-travel-split-v1-2-8-home-ledger-log';
 const ASSETS = [
   './',
   './index.html',
@@ -11,44 +11,85 @@ const ASSETS = [
 
 function upgradeIndex(html) {
   let out = html
-    .replaceAll('米兔分帳小幫手 V1.2.6', '米兔分帳小幫手 V1.2.7')
-    .replaceAll('V1.2.6', 'V1.2.7')
-    .replaceAll("version:'1.2.6'", "version:'1.2.7'")
-    .replaceAll('version:"1.2.6"', 'version:"1.2.7"')
-    .replaceAll('version:\'1.2.6\'', 'version:\'1.2.7\'');
+    .replaceAll('米兔分帳小幫手 V1.2.6', '米兔分帳小幫手 V1.2.8')
+    .replaceAll('米兔分帳小幫手 V1.2.7', '米兔分帳小幫手 V1.2.8')
+    .replaceAll('V1.2.6', 'V1.2.8')
+    .replaceAll('V1.2.7', 'V1.2.8')
+    .replaceAll("version:'1.2.6'", "version:'1.2.8'")
+    .replaceAll("version:'1.2.7'", "version:'1.2.8'")
+    .replaceAll('version:"1.2.6"', 'version:"1.2.8"')
+    .replaceAll('version:"1.2.7"', 'version:"1.2.8"');
 
-  const injector = `<script id="mitu-v127-home-ledger-shortcut">
+  const injector = `<script id="mitu-v128-home-ledger-and-update-log">
 (function(){
   function jumpToLedger(){
     var tab = document.querySelector('.tab-btn[data-tab="ledger"]');
     if(tab) tab.click();
   }
-  function addLedgerShortcut(){
-    if(document.getElementById('homeLedgerShortcutBtn')) return;
-    var tripsPage = document.getElementById('page-trips');
-    if(!tripsPage) return;
-    var target = tripsPage.querySelector('[data-jump="settlement"], [data-jump="expense"]');
-    if(!target) return;
-    var wrap = target.closest('.grid') || target.parentElement;
-    if(!wrap) return;
-    wrap.classList.remove('two');
-    wrap.classList.add('three');
+  function makeBtn(){
     var btn = document.createElement('button');
-    btn.id = 'homeLedgerShortcutBtn';
+    btn.id = 'topLedgerShortcutBtn';
     btn.type = 'button';
-    btn.className = 'btn secondary full';
+    btn.className = 'btn full';
     btn.textContent = '📒 查看個人帳簿';
     btn.setAttribute('data-jump','ledger');
     btn.addEventListener('click', jumpToLedger);
-    var settlement = tripsPage.querySelector('[data-jump="settlement"]');
-    if(settlement && settlement.parentElement === wrap) wrap.insertBefore(btn, settlement);
-    else wrap.appendChild(btn);
+    return btn;
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addLedgerShortcut);
-  else addLedgerShortcut();
+  function addTopLedgerShortcut(){
+    if(document.getElementById('topLedgerShortcutBtn')) return;
+    var tripbar = document.querySelector('.tripbar');
+    if(!tripbar) return;
+    tripbar.appendChild(makeBtn());
+  }
+  function addMiddleLedgerShortcut(){
+    if(document.getElementById('homeLedgerShortcutBtn')) return;
+    var tripsPage = document.getElementById('page-trips');
+    if(!tripsPage) return;
+    var setting = tripsPage.querySelector('#tripNameEdit');
+    if(!setting) return;
+    var card = setting.closest('.card');
+    if(!card) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'grid three no-print';
+    wrap.style.marginTop = '10px';
+    var b1 = document.createElement('button');
+    b1.className = 'btn full';
+    b1.textContent = '＋ 記一筆支出';
+    b1.addEventListener('click', function(){ var tab=document.querySelector('.tab-btn[data-tab="expense"]'); if(tab) tab.click(); });
+    var b2 = makeBtn();
+    b2.id = 'homeLedgerShortcutBtn';
+    var b3 = document.createElement('button');
+    b3.className = 'btn secondary full';
+    b3.textContent = '看結算';
+    b3.addEventListener('click', function(){ var tab=document.querySelector('.tab-btn[data-tab="settlement"]'); if(tab) tab.click(); });
+    wrap.appendChild(b1); wrap.appendChild(b2); wrap.appendChild(b3);
+    card.appendChild(wrap);
+  }
+  function addUpdateLog(){
+    if(document.getElementById('updateLogCard')) return;
+    var page = document.getElementById('page-data');
+    if(!page) return;
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'updateLogCard';
+    card.innerHTML = '<h2>更新記錄</h2><div class="list">'
+      + '<div class="item"><div class="item-title">V1.2.8｜首頁帳簿捷徑移到最上方</div><div class="item-meta">在「目前行程」下方直接新增「📒 查看個人帳簿」按鈕，並新增本更新記錄。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.7｜首頁帳簿捷徑</div><div class="item-meta">在首頁「目前行程設定」加入帳簿捷徑。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.6｜個人帳簿總覽</div><div class="item-meta">新增「帳簿」分頁，可依旅伴與幣別查看個人支出、分攤與明細。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.5｜行程名稱可編輯</div><div class="item-meta">行程列表可直接修改行程標題，不需刪除重建。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.4｜綠藍配色</div><div class="item-meta">移除粉紅點綴，改成淺綠主色＋粉藍輔色。</div></div>'
+      + '</div>';
+    var first = page.querySelector('.card');
+    if(first && first.nextSibling) page.insertBefore(card, first.nextSibling);
+    else page.appendChild(card);
+  }
+  function run(){ addTopLedgerShortcut(); addMiddleLedgerShortcut(); addUpdateLog(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
 })();
 </script>`;
-  if(!out.includes('mitu-v127-home-ledger-shortcut')) {
+  if(!out.includes('mitu-v128-home-ledger-and-update-log')) {
     out = out.replace('</body>', injector + '</body>');
   }
   return out;
