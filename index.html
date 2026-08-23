@@ -1,68 +1,918 @@
 <!doctype html>
-<html lang='zh-Hant'>
+<html lang="zh-Hant">
 <head>
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'>
-<meta name='theme-color' content='#8aa84a'>
-<meta name='apple-mobile-web-app-capable' content='yes'>
-<meta name='apple-mobile-web-app-title' content='米兔分帳'>
-<title>米兔分帳小幫手 V1.2.6</title>
-<link rel='manifest' href='manifest.webmanifest'>
-<link rel='icon' type='image/png' sizes='64x64' href='icons/favicon-64.png'>
-<link rel='apple-touch-icon' href='icons/apple-touch-icon.png'>
-<style>
-:root{--bg:#f5f8e9;--card:#fffefb;--ink:#35401d;--muted:#6f7e58;--line:#d9e5bb;--brand:#8aa84a;--brand2:#5f742b;--soft:#edf4d7;--soft2:#fafcf1;--accent:#b7dff0;--accent2:#e8f6fb;--accent3:#4f89a3;--danger:#b4534c;--ok:#4f7b35;--warn:#a8791f;--blue:#51798b;--shadow:0 10px 24px rgba(104,130,61,.12);--tap:44px;--radius:18px}*{box-sizing:border-box}body{margin:0;min-height:100%;background:radial-gradient(circle at 12% 0%,rgba(232,246,251,.78),transparent 28%),radial-gradient(circle at 92% 12%,rgba(183,223,240,.42),transparent 24%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Noto Sans TC','Microsoft JhengHei',sans-serif;font-size:16px;line-height:1.5}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:1060px;margin:0 auto;padding:14px 14px 98px}.hero{position:sticky;top:0;z-index:20;margin:0 -14px 12px;padding:12px 14px 10px;background:linear-gradient(180deg,#f7f9ed 72%,rgba(232,246,251,.78));backdrop-filter:blur(12px)}.titlebar{display:flex;gap:12px;align-items:center;justify-content:space-between}.brandbox{display:flex;gap:12px;align-items:center}.app-logo{width:56px;height:56px;border-radius:18px;border:1px solid var(--accent2);box-shadow:0 6px 16px rgba(79,137,163,.16);background:transparent;flex:none}h1{font-size:1.25rem;margin:0;font-weight:950;color:var(--brand2)}h1:after{content:' ✦';color:var(--accent3);font-size:.86em}.subtitle{margin:4px 0 0;color:var(--muted);font-size:.9rem}.version{font-size:.75rem;color:var(--accent3);background:var(--accent2);border:1px solid var(--accent);border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:900}.tripbar,.statusbar{display:grid;gap:8px;margin-top:10px}.tripbar{grid-template-columns:1fr auto;align-items:end}.statusbar{grid-template-columns:repeat(2,1fr)}.stat{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:9px 10px;box-shadow:0 4px 14px rgba(104,130,61,.08)}.stat .label{font-size:.75rem;color:var(--muted)}.stat .value{font-weight:950;color:var(--brand2)}.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,251,.97);border-top:2px solid var(--accent2);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(104,130,61,.12)}.tabs-inner{width:min(1060px,100%);margin:0 auto;display:flex;gap:6px;overflow-x:auto}.tab-btn{min-width:68px;min-height:var(--tap);border:0;border-radius:14px;background:transparent;color:var(--muted);font-weight:900;font-size:.78rem;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;white-space:nowrap}.tab-btn.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);box-shadow:inset 0 0 0 1px rgba(79,137,163,.35)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#fffefb,#fff);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0;box-shadow:var(--shadow)}.card h2{font-size:1.05rem;margin:0 0 10px;color:var(--brand2)}.card h2:before{content:'▸ ';color:var(--accent3)}.card h3{font-size:.96rem;margin:14px 0 8px;color:#5c6f2d}.note{font-size:.88rem;color:#63734c;background:linear-gradient(90deg,var(--accent2),#f3f8e7 46%);border:1px solid #dce9bf;border-left:5px solid var(--accent);border-radius:14px;padding:10px;margin:10px 0}.warn{font-size:.88rem;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:10px;margin:10px 0}.hint{font-size:.84rem;color:var(--muted);margin:6px 0 0}.grid{display:grid;gap:10px}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}label{display:block;font-size:.85rem;font-weight:900;color:#536336;margin:0 0 5px}input,select,textarea{width:100%;min-height:var(--tap);border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:10px 11px;outline:none}textarea{min-height:72px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,137,163,.22)}.row{display:flex;gap:8px;align-items:center}.row.wrap{flex-wrap:wrap}.grow{flex:1}.btn{min-height:var(--tap);border:0;border-radius:14px;background:linear-gradient(135deg,var(--brand),#9fba5d);color:white;font-weight:950;padding:10px 14px;box-shadow:0 8px 16px rgba(138,168,74,.20),0 2px 8px rgba(79,137,163,.16)}.secondary{background:#fff!important;color:var(--brand2)!important;border:1px solid var(--accent2)!important;box-shadow:none!important}.danger{background:#fee2e2!important;color:var(--danger)!important;border:1px solid #fecaca!important;box-shadow:none!important}.small{min-height:36px;border-radius:12px;padding:7px 10px;font-size:.84rem}.full{width:100%}.list{display:grid;gap:9px}.item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:11px;display:grid;gap:8px}.item-top{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.item-title{font-weight:950;color:#3f4d22;word-break:break-word}.item-meta{font-size:.84rem;color:var(--muted);word-break:break-word}.money{font-weight:950;color:var(--brand2);white-space:nowrap}.empty{border:1px dashed #c6d5a7;border-radius:16px;padding:18px;text-align:center;color:var(--muted);background:rgba(255,255,255,.6)}.pillbox{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#3f4d22;font-weight:900}.pill.active{background:linear-gradient(135deg,var(--soft),var(--accent2));border-color:var(--accent)}.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg button{box-shadow:none;background:#fff;color:var(--muted);border:1px solid var(--line)}.seg button.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);border-color:var(--accent)}.badge{display:inline-flex;border-radius:999px;background:#f5f7ee;border:1px solid #dde6c8;color:#687255;font-size:.76rem;font-weight:900;padding:2px 8px;white-space:nowrap}.badge.person{background:var(--accent2);border-color:var(--accent);color:var(--accent3)}.badge.pool{background:#eef6e5;border-color:#d2e6b4;color:#617b2e}.link{color:var(--blue);font-weight:900;text-decoration:none;word-break:break-all}.summary-grid{display:grid;gap:10px}.balance,.settle{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}.settle{border-left:5px solid var(--accent3)}.currency-block{background:var(--soft2);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.currency-title{font-weight:950;color:var(--brand2);margin-bottom:8px}.currency-title:after{content:' ✦';color:var(--accent3)}table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:.78rem;text-align:left;color:var(--muted);font-weight:950;padding:0 8px}td{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px}td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}.ledger-person{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px;margin:10px 0}.ledger-total{background:linear-gradient(135deg,var(--soft2),var(--accent2));border:1px solid var(--accent2);border-radius:14px;padding:9px}.role-tag{display:inline-flex;border-radius:999px;padding:2px 8px;font-size:.76rem;font-weight:950;background:var(--accent2);color:var(--accent3);border:1px solid var(--accent)}.toast{position:fixed;left:14px;right:14px;bottom:88px;z-index:50;max-width:640px;margin:0 auto;background:#4e5d27;color:white;border-radius:16px;padding:12px 14px;display:none}.toast.show{display:block}@media (min-width:760px){.app{padding-bottom:28px}.tabs{position:sticky;top:82px;bottom:auto;margin:0 auto 12px;padding:0;background:transparent;border:0;box-shadow:none}.tabs-inner{background:rgba(255,255,255,.92);border:1px solid var(--accent2);border-radius:18px;padding:6px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(8,1fr)}.tab-btn{min-width:0;flex-direction:row}.statusbar{grid-template-columns:repeat(4,1fr)}.summary-grid{grid-template-columns:1fr 1fr}}@media (max-width:620px){.two,.three,.four,.ledger-totals{grid-template-columns:1fr}.tripbar{grid-template-columns:1fr}.statusbar{grid-template-columns:1fr 1fr}table{min-width:660px}.table-wrap{overflow-x:auto}.item-top{display:grid}.right{text-align:left}}@media print{.hero,.tabs,.no-print,.toast{display:none!important}.app{max-width:none;padding:0}.page{display:block!important}.card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}button,input,select,textarea{display:none!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#8aa84a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="米兔分帳">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>米兔分帳小幫手 V1.4.0</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <style>
+    :root{
+      --bg:#f5f8e9; --card:#fffefb; --ink:#35401d; --muted:#6f7e58; --line:#d9e5bb;
+      --brand:#8aa84a; --brand2:#5f742b; --soft:#edf4d7; --soft2:#fafcf1;
+      --accent:#b7dff0; --accent2:#e8f6fb; --accent3:#4f89a3;
+      --danger:#b4534c; --ok:#4f7b35; --warn:#a8791f; --blue:#51798b;
+      --shadow:0 10px 24px rgba(104,130,61,.12); --radius:18px; --tap:44px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at 12% 0%,rgba(232,246,251,.78),transparent 28%),radial-gradient(circle at 92% 12%,rgba(183,223,240,.42),transparent 24%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:16px;line-height:1.5}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer;touch-action:manipulation}
+    .app{max-width:1060px;margin:0 auto;padding:14px 14px 98px}
+    header.hero{position:sticky;top:0;z-index:20;margin:0 -14px 12px;padding:12px 14px 10px;background:linear-gradient(180deg,#f7f9ed 72%,rgba(232,246,251,.78) 100%,rgba(245,248,233,0));backdrop-filter:blur(12px)}
+    .titlebar{display:flex;gap:12px;align-items:center;justify-content:space-between}.brandbox{display:flex;gap:12px;align-items:center}.app-logo{width:56px;height:56px;border-radius:18px;border:1px solid var(--accent2);box-shadow:0 6px 16px rgba(79,137,163,.16);background:transparent;flex:none}
+    h1{font-size:1.26rem;margin:0;font-weight:950;letter-spacing:.02em;color:var(--brand2)}h1::after{content:" ✦";color:var(--accent3);font-size:.86em}
+    .version{font-size:.75rem;color:var(--accent3);background:var(--accent2);border:1px solid var(--accent);border-radius:999px;padding:3px 8px;white-space:nowrap;font-weight:900}
+    .subtitle{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+    .tripbar{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;margin-top:10px}
+    .statusbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 0}
+    .stat{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:9px 10px;box-shadow:0 4px 14px rgba(104,130,61,.08)}
+    .stat .label{font-size:.75rem;color:var(--muted)}
+    .stat .value{font-weight:950;font-size:1rem;margin-top:1px;color:var(--brand2)}
+    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,251,.97);border-top:2px solid var(--accent2);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(104,130,61,.12)}
+    .tabs-inner{width:min(1060px,100%);margin:0 auto;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .tabs-inner::-webkit-scrollbar{display:none}
+    .tab-btn{min-width:72px;min-height:var(--tap);border:0;border-radius:14px;background:transparent;color:var(--muted);font-weight:900;font-size:.78rem;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;white-space:nowrap}
+    .tab-btn.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);box-shadow:inset 0 0 0 1px rgba(79,137,163,.35)}
+    .tab-btn span:first-child{font-size:1.05rem;line-height:1}
+    .page{display:none;animation:fade .15s ease-out}.page.active{display:block}
+    @keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .card{background:linear-gradient(180deg,#fffefb 0%,#fff 100%);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:12px 0;box-shadow:var(--shadow)}
+    .card h2{font-size:1.05rem;margin:0 0 10px;color:var(--brand2)}.card h2::before{content:"▸ ";color:var(--accent3)}
+    .card h3{font-size:.96rem;margin:14px 0 8px;color:#5c6f2d}.hint{font-size:.86rem;color:var(--muted);margin:6px 0 0}
+    .note{font-size:.88rem;color:#63734c;background:linear-gradient(90deg,var(--accent2),#f3f8e7 46%);border:1px solid #dce9bf;border-left:5px solid var(--accent);border-radius:14px;padding:10px;margin:10px 0}
+    .warn{font-size:.88rem;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:10px;margin:10px 0}
+    .grid{display:grid;gap:10px}.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:repeat(3,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}
+    label{display:block;font-size:.85rem;font-weight:900;color:#536336;margin:0 0 5px}
+    input,select,textarea{width:100%;min-height:var(--tap);border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);padding:10px 11px;outline:none}
+    textarea{min-height:72px;resize:vertical} input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,137,163,.22)}
+    .row{display:flex;gap:8px;align-items:center}.row.wrap{flex-wrap:wrap}.row>*{min-width:0}.grow{flex:1}.trip-name-input{font-weight:950;color:var(--brand2)}
+    .btn{min-height:var(--tap);border:0;border-radius:14px;background:linear-gradient(135deg,var(--brand),#9fba5d);color:white;font-weight:950;padding:10px 14px;box-shadow:0 8px 16px rgba(138,168,74,.20),0 2px 8px rgba(79,137,163,.16)}
+    .btn.secondary{background:#fff;color:var(--brand2);border:1px solid var(--accent2);box-shadow:none}.btn.danger{background:#fee2e2;color:var(--danger);border:1px solid #fecaca;box-shadow:none}.btn.ok{background:#dcfce7;color:var(--ok);border:1px solid #bbf7d0;box-shadow:none}.btn.full{width:100%}.btn.small{min-height:36px;border-radius:12px;padding:7px 10px;font-size:.84rem}
+    .pillbox{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#3f4d22;font-weight:900}.pill input{width:auto;min-height:0;accent-color:var(--brand)}.pill.active{background:linear-gradient(135deg,var(--soft),var(--accent2));border-color:var(--accent);color:var(--brand2)}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg button{box-shadow:none;background:#fff;color:var(--muted);border:1px solid var(--line)}.seg button.active{background:linear-gradient(135deg,var(--soft),var(--accent2));color:var(--brand2);border-color:var(--accent)}
+    .empty{border:1px dashed #c6d5a7;border-radius:16px;padding:18px;text-align:center;color:var(--muted);background:rgba(255,255,255,.6)}
+    .list{display:grid;gap:9px}.item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:11px;display:grid;gap:8px}.item-top{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.item-title{font-weight:950;color:#3f4d22;word-break:break-word}.item-meta{font-size:.84rem;color:var(--muted);word-break:break-word}.money{font-weight:950;color:var(--brand2);white-space:nowrap}.right{text-align:right}.link{color:var(--blue);font-weight:900;text-decoration:none;word-break:break-all}.link:hover{text-decoration:underline}
+    .summary-grid{display:grid;gap:10px}.balance{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}.balance .name{font-weight:950}.balance .desc{font-size:.82rem;color:var(--muted)}.plus{color:var(--ok)}.minus{color:var(--danger)}.zero{color:var(--muted)}
+    .settle{border-left:5px solid var(--accent3);background:#fff;border-radius:16px;padding:12px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.settle strong{color:var(--brand2)}
+    .currency-block{background:var(--soft2);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}.currency-title{font-weight:950;color:var(--brand2);margin-bottom:8px}.currency-title::after{content:"  ✦";color:var(--accent3)}
+    .ledger-person{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px;margin:10px 0}.ledger-person h3{margin:0 0 8px!important}.ledger-totals{display:grid;gap:8px;grid-template-columns:repeat(2,1fr);margin:8px 0}.ledger-total{background:linear-gradient(135deg,var(--soft2),var(--accent2));border:1px solid var(--accent2);border-radius:14px;padding:9px}.ledger-total .label{font-size:.78rem;color:var(--muted);font-weight:900}.ledger-total .value{font-size:.96rem;color:var(--brand2);font-weight:950;margin-top:2px}.role-tag{display:inline-flex;border-radius:999px;padding:2px 8px;font-size:.76rem;font-weight:950;background:var(--accent2);color:var(--accent3);border:1px solid var(--accent)}.split-share-list{display:grid;gap:8px;margin-top:8px}.split-share-row{display:grid;grid-template-columns:1fr minmax(110px,160px);gap:8px;align-items:center;border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px 10px}.split-share-row .person{font-weight:950;color:var(--brand2)}.split-sum{font-weight:950;color:var(--accent3);margin-top:6px}.split-sum.bad{color:var(--danger)}.edit-banner{font-size:.88rem;color:var(--accent3);background:var(--accent2);border:1px solid var(--accent);border-radius:14px;padding:9px 10px;margin:10px 0;font-weight:950}.edit-target{box-shadow:0 0 0 3px rgba(79,137,163,.18)}
+    .badge{display:inline-flex;align-items:center;border-radius:999px;background:#f5f7ee;border:1px solid #dde6c8;color:#687255;font-size:.76rem;font-weight:900;padding:2px 8px;white-space:nowrap}.badge.pool{background:#eef6e5;border-color:#d2e6b4;color:#617b2e}.badge.person{background:var(--accent2);border-color:var(--accent);color:var(--accent3)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:.78rem;text-align:left;color:var(--muted);font-weight:950;padding:0 8px}td{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:14px 0 0 14px}td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}
+    .toast{position:fixed;left:14px;right:14px;bottom:88px;z-index:50;max-width:640px;margin:0 auto;background:#4e5d27;color:white;border-radius:16px;padding:12px 14px;box-shadow:0 12px 28px rgba(0,0,0,.22);display:none}.toast.show{display:block;animation:fade .12s ease-out}
+    @media (min-width:760px){.app{padding-bottom:28px}.tabs{position:sticky;top:82px;bottom:auto;margin:0 auto 12px;padding:0;background:transparent;border:0;box-shadow:none}.tabs-inner{background:rgba(255,255,255,.92);border:1px solid var(--accent2);border-radius:18px;padding:6px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(8,1fr)}.tab-btn{min-width:0;font-size:.88rem;flex-direction:row;gap:6px}.statusbar{grid-template-columns:repeat(4,1fr)}.summary-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:620px){.grid.two,.grid.three,.grid.four,.ledger-totals{grid-template-columns:1fr}.tripbar{grid-template-columns:1fr}.statusbar{grid-template-columns:1fr 1fr}h1{font-size:1.14rem}.version{font-size:.7rem}.hide-mobile{display:none}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}table{min-width:600px}.item-top{align-items:flex-start}.right{text-align:left}}
+    @media print{body{background:#fff;color:#000}header.hero,.tabs,.no-print,.toast{display:none!important}.app{max-width:none;padding:0}.page{display:block!important}.card{box-shadow:none;border:1px solid #bbb;break-inside:avoid}button,input,select,textarea{display:none!important}a{color:#000}}
+  </style>
 </head>
 <body>
-<div class='app'>
-<header class='hero'><div class='titlebar'><div class='brandbox'><img class='app-logo' src='icons/icon-192.png' alt='米兔分帳圖示'><div><h1>米兔分帳小幫手</h1><p class='subtitle'>用行程分開管理，原幣別記帳，最後分幣別結算。</p></div></div><div class='version'>V1.2.6</div></div><div class='tripbar no-print'><div><label>目前行程</label><select id='currentTripSelect'></select></div><button class='btn secondary' data-jump='trips'>管理行程</button></div><div class='statusbar' id='statusbar'></div></header>
-<nav class='tabs no-print'><div class='tabs-inner'><button class='tab-btn active' data-tab='trips'><span>🧳</span><span>行程</span></button><button class='tab-btn' data-tab='people'><span>👥</span><span>旅伴</span></button><button class='tab-btn' data-tab='pool'><span>👛</span><span>現金池</span></button><button class='tab-btn' data-tab='expense'><span>🧾</span><span>記一筆</span></button><button class='tab-btn' data-tab='search'><span>🔎</span><span>查詢</span></button><button class='tab-btn' data-tab='ledger'><span>📒</span><span>帳簿</span></button><button class='tab-btn' data-tab='settlement'><span>💸</span><span>結算</span></button><button class='tab-btn' data-tab='data'><span>🗂️</span><span>資料</span></button></div></nav>
-<main>
-<section class='page active' id='page-trips'><div class='card'><h2>行程分帳</h2><div class='note'>每個行程都有自己的旅伴、支出、現金池與雲端連結。</div><div class='row'><input id='newTripName' class='grow' placeholder='新增行程，例如：大邱三日行'><button class='btn' id='addTripBtn'>新增</button></div></div><div class='card'><h2>目前行程設定</h2><div class='grid two'><div><label>行程名稱</label><input id='tripNameEdit'></div><div><label>&nbsp;</label><button class='btn secondary full' id='renameTripBtn'>儲存名稱</button></div></div></div><div class='card'><h2>行程列表</h2><div id='tripList' class='list'></div></div><div class='card'><h2>最近支出</h2><div id='recentExpenses' class='list'></div></div></section>
-<section class='page' id='page-people'><div class='card'><h2>旅伴名單</h2><div class='row'><input id='personName' class='grow' placeholder='輸入旅伴姓名'><button class='btn' id='addPersonBtn'>新增</button></div></div><div class='card'><h2>名單</h2><div id='peopleList' class='list'></div></div></section>
-<section class='page' id='page-pool'><div class='card'><h2>現金池</h2><div class='note'>有人先把錢放進共同錢包，就記在這裡。支出可選「現金池支付」。</div><div class='grid four'><div><label>日期</label><input id='poolDate' type='date'></div><div><label>誰放錢</label><select id='poolPerson'></select></div><div><label>金額</label><input id='poolAmount' type='number' min='0' step='0.01'></div><div><label>幣別</label><select id='poolCurrency'></select></div></div><div style='margin-top:10px'><label>備註</label><input id='poolNote'></div><button class='btn full' id='savePoolBtn' style='margin-top:12px'>加入現金池</button></div><div class='card'><h2>現金池餘額</h2><div id='poolBalanceList' class='list'></div></div><div class='card'><h2>現金池紀錄</h2><div id='poolList' class='list'></div></div></section>
-<section class='page' id='page-expense'><div class='card'><h2>新增支出</h2><div class='grid two'><div><label>日期</label><input id='expenseDate' type='date'></div><div><label>項目</label><input id='expenseTitle' placeholder='例如：午餐、計程車、門票'></div></div><div class='grid three' style='margin-top:10px'><div><label>金額</label><input id='expenseAmount' type='number' min='0' step='0.01'></div><div><label>幣別</label><select id='expenseCurrency'></select></div><div><label>分類</label><select id='expenseCategory'></select></div></div><h3>付款方式</h3><div class='seg no-print'><button class='btn active' id='payerPersonMode' type='button'>旅伴先付</button><button class='btn' id='payerPoolMode' type='button'>現金池支付</button></div><div id='payerPersonBox' style='margin-top:10px'><label>誰先付</label><select id='expensePayer'></select></div><div id='payerPoolBox' style='margin-top:10px;display:none'><div class='warn'>使用現金池支付時，請先到「現金池」登錄出資。</div></div><h3>誰要一起分攤</h3><div class='row no-print' style='margin-bottom:8px'><button class='btn secondary small' id='selectAllSharers'>全選</button><button class='btn secondary small' id='clearSharers'>清空</button></div><div id='sharerList' class='pillbox'></div><div class='grid two' style='margin-top:10px'><div><label>雲端收據／票券連結</label><input id='expenseReceiptUrl' type='url'></div><div><label>備註</label><input id='expenseNote'></div></div><div class='grid two' style='margin-top:12px'><button class='btn full' id='saveExpenseBtn'>儲存這一筆</button><button class='btn secondary full' id='resetExpenseFormBtn'>清空表單</button></div></div><div class='card'><h2>費用列表</h2><div id='expensesList' class='list'></div></div></section>
-<section class='page' id='page-search'><div class='card'><h2>搜尋支出</h2><div class='grid two'><div><label>用日期分類</label><select id='searchDate'></select></div><div><label>關鍵字</label><input id='searchKeyword' type='search'></div></div><div id='searchResult' class='list' style='margin-top:12px'></div></div><div class='card'><h2>雲端連結庫</h2><div class='grid two'><div><label>日期</label><input id='linkDate' type='date'></div><div><label>類型</label><select id='linkType'></select></div></div><div class='grid two' style='margin-top:10px'><div><label>名稱</label><input id='linkTitle'></div><div><label>雲端連結</label><input id='linkUrl' type='url'></div></div><div style='margin-top:10px'><label>備註</label><input id='linkNote'></div><button class='btn full' id='saveLinkBtn' style='margin-top:12px'>儲存連結</button></div><div class='card'><h2>已存連結</h2><div id='linkList' class='list'></div></div></section>
-<section class='page' id='page-ledger'><div class='card'><h2>個人帳簿總覽</h2><div class='note'>這頁當一般帳簿使用：看每個人在本行程中「自己先付、現金池出資、實際拿出去、個人分攤消費」。最後誰付誰仍看「結算」。</div><div class='grid two'><div><label>查看對象</label><select id='ledgerPerson'></select></div><div><label>幣別</label><select id='ledgerCurrency'></select></div></div><div id='ledgerList' style='margin-top:12px'></div></div></section>
-<section class='page' id='page-settlement'><div class='card'><h2>最後誰付誰</h2><div class='note'>不換算匯率。台幣、日圓、韓幣、美金分開結算。</div><div id='settlementList' class='list'></div><div class='grid two no-print' style='margin-top:12px'><button class='btn secondary full' id='copySettlementBtn'>複製結算文字</button><button class='btn secondary full' onclick='window.print()'>列印／存成 PDF</button></div></div><div class='card'><h2>每人收支</h2><div id='balancesList' class='summary-grid'></div></div><div class='card'><h2>現金池剩餘歸屬</h2><div id='poolRemainderList' class='list'></div></div></section>
-<section class='page' id='page-data'><div class='card'><h2>JSON 備份</h2><div class='grid two'><button class='btn secondary full' id='exportAllBtn'>匯出全部行程 JSON</button><button class='btn secondary full' id='exportTripBtn'>匯出目前行程 JSON</button></div><label class='btn secondary full' style='text-align:center;display:flex;align-items:center;justify-content:center;margin-top:10px'>匯入 JSON 備份<input id='importFile' type='file' accept='application/json,.json' style='display:none'></label><p class='hint'>換手機、換瀏覽器或清除瀏覽資料前，請先匯出備份。</p></div><div class='card'><h2>危險區</h2><div class='grid two'><button class='btn danger full' id='deleteTripBtn'>刪除目前行程</button><button class='btn danger full' id='wipeBtn'>清除所有資料</button></div></div></section>
-</main></div><div class='toast' id='toast'></div>
+  <div class="app">
+    <header class="hero">
+      <div class="titlebar">
+        <div class="brandbox">
+          <img class="app-logo" src="icons/icon-192.png" alt="米兔分帳圖示">
+          <div>
+            <h1>米兔分帳小幫手</h1>
+            <p class="subtitle">用行程分開管理，原幣別記帳，最後分幣別結算。</p>
+          </div>
+        </div>
+        <div class="version">V1.4.0</div>
+      </div>
+      <div class="tripbar no-print">
+        <div>
+          <label for="currentTripSelect">目前行程</label>
+          <select id="currentTripSelect"></select>
+        </div>
+        <button class="btn secondary" data-jump="trips">管理行程</button>
+        <button class="btn" data-jump="ledger">📒 查看個人帳簿</button>
+      </div>
+      <div class="statusbar" id="statusbar"></div>
+    </header>
+
+    <nav class="tabs no-print" aria-label="功能分頁">
+      <div class="tabs-inner">
+        <button class="tab-btn active" data-tab="trips"><span>🧳</span><span>行程</span></button>
+        <button class="tab-btn" data-tab="people"><span>👥</span><span>旅伴</span></button>
+        <button class="tab-btn" data-tab="pool"><span>👛</span><span>現金池</span></button>
+        <button class="tab-btn" data-tab="expense"><span>🧾</span><span>記一筆</span></button>
+        <button class="tab-btn" data-tab="search"><span>🔎</span><span>查詢</span></button>
+        <button class="tab-btn" data-tab="ledger"><span>📒</span><span>帳簿</span></button>
+        <button class="tab-btn" data-tab="settlement"><span>💸</span><span>結算</span></button>
+        <button class="tab-btn" data-tab="data"><span>🗂️</span><span>資料</span></button>
+      </div>
+    </nav>
+
+    <main>
+      <section class="page active" id="page-trips">
+        <div class="card">
+          <h2>行程分帳</h2>
+          <div class="note">每個行程都有自己的旅伴、支出、現金池、收據與票券連結。例如：大邱三日行、廣島遊可以完全分開。</div>
+          <div class="row">
+            <input id="newTripName" class="grow" type="text" placeholder="新增行程，例如：大邱三日行">
+            <button class="btn" id="addTripBtn">新增</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>目前行程設定</h2>
+          <div class="grid two">
+            <div>
+              <label for="tripNameEdit">行程名稱</label>
+              <input id="tripNameEdit" type="text">
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn secondary full" id="renameTripBtn">儲存名稱</button>
+            </div>
+          </div>
+          <div class="grid three no-print" style="margin-top:10px">
+            <button class="btn full" data-jump="expense">＋ 記一筆支出</button>
+            <button class="btn secondary full" data-jump="ledger">📒 查看個人帳簿</button>
+            <button class="btn secondary full" data-jump="settlement">看結算</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>行程列表</h2>
+          <div id="tripList" class="list"></div>
+        </div>
+        <div class="card">
+          <h2>最近支出</h2>
+          <div id="recentExpenses" class="list"></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-people">
+        <div class="card">
+          <h2>旅伴名單</h2>
+          <div class="row">
+            <input id="personName" class="grow" type="text" placeholder="輸入旅伴姓名，例如：米兔、Rita">
+            <button class="btn" id="addPersonBtn">新增</button>
+          </div>
+          <p class="hint">旅伴只屬於目前行程。刪除旅伴會影響既有費用，已被使用的人不能直接刪除。</p>
+        </div>
+        <div class="card"><h2>名單</h2><div id="peopleList" class="list"></div></div>
+      </section>
+
+      <section class="page" id="page-pool">
+        <div class="card">
+          <h2>現金池</h2>
+          <div class="note">有人先把錢放進共同錢包，就記在這裡。之後支出可選「現金池支付」。現金池不換匯，各幣別分開看。</div>
+          <div class="grid four">
+            <div><label for="poolDate">日期</label><input id="poolDate" type="date"></div>
+            <div><label for="poolPerson">誰放錢</label><select id="poolPerson"></select></div>
+            <div><label for="poolAmount">金額</label><input id="poolAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"></div>
+            <div><label for="poolCurrency">幣別</label><select id="poolCurrency"></select></div>
+          </div>
+          <div style="margin-top:10px"><label for="poolNote">備註</label><input id="poolNote" type="text" placeholder="例如：共同餐費基金、先放 1 萬日圓"></div>
+          <div class="grid two" style="margin-top:12px"><button class="btn full" id="savePoolBtn">加入現金池</button><button class="btn secondary full" id="cancelPoolEditBtn" style="display:none">取消編輯</button></div>
+        </div>
+        <div class="card"><h2>現金池餘額</h2><div id="poolBalanceList" class="list"></div></div>
+        <div class="card"><h2>現金池紀錄</h2><div id="poolList" class="list"></div></div>
+      </section>
+
+      <section class="page" id="page-expense">
+        <div class="card">
+          <h2>新增支出</h2>
+          <div class="grid two">
+            <div><label for="expenseDate">日期</label><input id="expenseDate" type="date"></div>
+            <div><label for="expenseTitle">項目</label><input id="expenseTitle" type="text" placeholder="例如：午餐、計程車、門票"></div>
+          </div>
+          <div class="grid three" style="margin-top:10px">
+            <div><label for="expenseAmount">金額</label><input id="expenseAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0"></div>
+            <div><label for="expenseCurrency">幣別</label><select id="expenseCurrency"></select></div>
+            <div><label for="expenseCategory">分類</label><select id="expenseCategory"></select></div>
+          </div>
+          <h3>付款方式</h3>
+          <div class="seg no-print">
+            <button class="btn active" id="payerPersonMode" type="button">旅伴先付</button>
+            <button class="btn" id="payerPoolMode" type="button">現金池支付</button>
+          </div>
+          <div id="payerPersonBox" style="margin-top:10px"><label for="expensePayer">誰先付</label><select id="expensePayer"></select></div>
+          <div id="payerPoolBox" style="margin-top:10px;display:none"><div class="warn">使用現金池支付時，請先到「現金池」登錄有人放錢。若現金池不足，結算會提醒補登。</div></div>
+          <h3>誰要一起分攤</h3>
+          <div class="row no-print" style="margin-bottom:8px"><button class="btn secondary small" id="selectAllSharers">全選</button><button class="btn secondary small" id="clearSharers">清空</button></div>
+          <div id="sharerList" class="pillbox"></div>
+          <h3>分攤方式</h3>
+          <div class="seg no-print">
+            <button class="btn active" id="equalSplitMode" type="button">平均分攤</button>
+            <button class="btn" id="customSplitMode" type="button">自訂分攤金額</button>
+          </div>
+          <div id="customSplitBox" style="display:none;margin-top:10px">
+            <div class="note">適合點餐各吃各的：例如總額 190，甲 100、乙 90。自訂分攤合計必須等於總金額。</div>
+            <div id="customShareList" class="split-share-list"></div>
+            <div id="customShareSum" class="split-sum"></div>
+          </div>
+          <div class="grid two" style="margin-top:10px">
+            <div><label for="expenseReceiptUrl">雲端收據／票券連結</label><input id="expenseReceiptUrl" type="url" placeholder="貼 Google Drive、相簿、雲端票券連結，可不填"></div>
+            <div><label for="expenseNote">備註</label><input id="expenseNote" type="text" placeholder="可不填"></div>
+          </div>
+          <div id="expenseEditBanner" class="edit-banner" style="display:none">正在編輯既有支出</div><div class="grid three" style="margin-top:12px"><button class="btn full" id="saveExpenseBtn">儲存這一筆</button><button class="btn secondary full" id="resetExpenseFormBtn">清空表單</button><button class="btn secondary full" id="cancelExpenseEditBtn" style="display:none">取消編輯</button></div>
+        </div>
+        <div class="card"><h2>費用列表</h2><div id="expensesList" class="list"></div></div>
+      </section>
+
+      <section class="page" id="page-search">
+        <div class="card">
+          <h2>搜尋支出</h2>
+          <div class="grid two">
+            <div><label for="searchDate">用日期分類</label><select id="searchDate"></select></div>
+            <div><label for="searchKeyword">關鍵字</label><input id="searchKeyword" type="search" placeholder="搜尋項目、分類、備註、付款人"></div>
+          </div>
+          <div id="searchResult" class="list" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <h2>雲端連結庫</h2>
+          <div class="grid two">
+            <div><label for="linkDate">日期</label><input id="linkDate" type="date"></div>
+            <div><label for="linkType">類型</label><select id="linkType"></select></div>
+          </div>
+          <div class="grid two" style="margin-top:10px">
+            <div><label for="linkTitle">名稱</label><input id="linkTitle" type="text" placeholder="例如：住宿訂單、車票 QR code"></div>
+            <div><label for="linkUrl">雲端連結</label><input id="linkUrl" type="url" placeholder="貼連結"></div>
+          </div>
+          <div style="margin-top:10px"><label for="linkNote">備註</label><input id="linkNote" type="text" placeholder="可不填"></div>
+          <div class="grid two" style="margin-top:12px"><button class="btn full" id="saveLinkBtn">儲存連結</button><button class="btn secondary full" id="cancelLinkEditBtn" style="display:none">取消編輯</button></div>
+        </div>
+        <div class="card"><h2>已存連結</h2><div id="linkList" class="list"></div></div>
+      </section>
+
+      <section class="page" id="page-ledger">
+        <div class="card">
+          <h2>個人支出總覽</h2>
+          <div class="note">這頁當一般帳簿使用：看每個人在本行程中「自己先付多少、現金池出資多少、個人實際分攤消費多少」。它不是最後轉帳結算，最後誰付誰仍看「結算」分頁。</div>
+          <div class="grid two">
+            <div><label for="ledgerPerson">查看對象</label><select id="ledgerPerson"></select></div>
+            <div><label for="ledgerCurrency">幣別</label><select id="ledgerCurrency"></select></div>
+          </div>
+          <div id="ledgerList" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-settlement">
+        <div class="card">
+          <h2>最後誰付誰</h2>
+          <div class="note">不換算匯率。台幣、日圓、韓幣、美金會分開結算。</div>
+          <div id="settlementList" class="list"></div>
+          <div class="grid two no-print" style="margin-top:12px"><button class="btn secondary full" id="copySettlementBtn">複製結算文字</button><button class="btn secondary full" onclick="window.print()">列印／存成 PDF</button></div>
+        </div>
+        <div class="card"><h2>每人收支</h2><div id="balancesList" class="summary-grid"></div></div>
+        <div class="card"><h2>現金池剩餘歸屬</h2><div id="poolRemainderList" class="list"></div></div>
+      </section>
+
+      <section class="page" id="page-data">
+        <div class="card">
+          <h2>JSON 備份</h2>
+          <div class="grid two">
+            <button class="btn secondary full" id="exportAllBtn">匯出全部行程 JSON</button>
+            <button class="btn secondary full" id="exportTripBtn">匯出目前行程 JSON</button>
+          </div>
+          <label class="btn secondary full" style="text-align:center;display:flex;align-items:center;justify-content:center;margin-top:10px">匯入 JSON 備份<input id="importFile" type="file" accept="application/json,.json" style="display:none"></label>
+          <p class="hint">換手機、換瀏覽器或清除瀏覽資料前，請先匯出備份。</p>
+          <div id="downloadNotice" class="note" style="display:none;margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <h2>更新記錄</h2>
+          <div class="list">
+            <div class="item"><div class="item-title">V1.4.0｜完整原生部署版</div><div class="item-meta">把既有紀錄編輯、自訂分攤金額、帳簿捷徑、JSON 匯出位置提示與更新記錄全部整合在 index.html 主程式內，不再依賴 service worker 熱修補丁。</div></div>
+            <div class="item"><div class="item-title">V1.3.1｜JSON 匯出位置提示</div><div class="item-meta">匯出 JSON 後會顯示檔名與 Android 常見下載位置，方便找備份檔。</div></div>
+            <div class="item"><div class="item-title">V1.3.0｜既有紀錄可編輯</div><div class="item-meta">支出、現金池、雲端連結都新增「編輯」按鈕，可修改後更新，不必刪除重建。</div></div>
+            <div class="item"><div class="item-title">V1.2.9｜自訂分攤金額</div><div class="item-meta">新增支出可選「自訂分攤金額」，適合點餐各吃各的；自訂金額合計需等於總金額。</div></div>
+            <div class="item"><div class="item-title">V1.2.8｜首頁帳簿捷徑移到最上方</div><div class="item-meta">在「目前行程」下方直接新增「📒 查看個人帳簿」按鈕，避免手機畫面下方或頁面中段看不到；新增本更新記錄。</div></div>
+            <div class="item"><div class="item-title">V1.2.7｜首頁帳簿捷徑</div><div class="item-meta">在首頁「目前行程設定」加入帳簿捷徑。</div></div>
+            <div class="item"><div class="item-title">V1.2.6｜個人帳簿總覽</div><div class="item-meta">新增「帳簿」分頁，可依旅伴與幣別查看個人支出、分攤與明細。</div></div>
+            <div class="item"><div class="item-title">V1.2.5｜行程名稱可編輯</div><div class="item-meta">行程列表可直接修改行程標題，不需刪除重建。</div></div>
+            <div class="item"><div class="item-title">V1.2.4｜綠藍配色</div><div class="item-meta">移除粉紅點綴，改成淺綠主色＋粉藍輔色。</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>安裝與離線</h2>
+          <div class="note">部署到 GitHub Pages、Netlify 或任何 HTTPS 網站後，可用手機瀏覽器「加到主畫面」。開啟過一次後，之後可離線使用。</div>
+        </div>
+        <div class="card">
+          <h2>危險區</h2>
+          <div class="grid two">
+            <button class="btn danger full" id="deleteTripBtn">刪除目前行程</button>
+            <button class="btn danger full" id="wipeBtn">清除所有資料</button>
+          </div>
+          <p class="hint">刪除前建議先匯出 JSON。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
 <script>
-(()=>{
-const KEY='mituTravelSplit.v1_1', OLD='mituTravelSplit.v1';
-const today=()=>new Date().toISOString().slice(0,10);
-const id=()=>crypto&&crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2);
-const C={TWD:{name:'台幣',symbol:'NT$',decimals:0},JPY:{name:'日圓',symbol:'¥',decimals:0},KRW:{name:'韓幣',symbol:'₩',decimals:0},USD:{name:'美金',symbol:'US$',decimals:2}};
-const cats=['餐食','交通','門票','住宿','購物','票券','其他'], linkTypes=['收據','票券','訂房','交通','雲端相簿','其他'];
-const $=x=>document.getElementById(x), $$=s=>[...document.querySelectorAll(s)];
-function E(t,a={},k=[]){const n=document.createElement(t);Object.entries(a).forEach(([p,v])=>{if(v==null)return;if(p==='class')n.className=v;else if(p==='text')n.textContent=v;else if(p==='html')n.innerHTML=v;else if(p.startsWith('on'))n.addEventListener(p.slice(2),v);else n.setAttribute(p,v)});k.forEach(c=>n.append(c));return n}
-const people0=()=>[{id:id(),name:'米兔'},{id:id(),name:'Rita'}];
-const makeTrip=(name='未命名行程')=>({id:id(),name,people:people0(),expenses:[],poolContributions:[],links:[]});
-function normTrip(t={}){return{id:t.id||id(),name:t.name||'未命名行程',people:Array.isArray(t.people)&&t.people.length?t.people.map(p=>({id:p.id||id(),name:p.name||'未命名'})):people0(),expenses:Array.isArray(t.expenses)?t.expenses.map(x=>({id:x.id||id(),createdAt:x.createdAt||new Date().toISOString(),date:x.date||today(),title:x.title||'未命名項目',amount:+x.amount||0,currency:C[x.currency]?x.currency:'TWD',category:x.category||'其他',payerType:x.payerType==='pool'?'pool':'person',payerId:x.payerId||'',sharerIds:Array.isArray(x.sharerIds)?x.sharerIds:[],note:x.note||'',receiptUrl:x.receiptUrl||''})):[],poolContributions:Array.isArray(t.poolContributions)?t.poolContributions.map(x=>({id:x.id||id(),createdAt:x.createdAt||new Date().toISOString(),date:x.date||today(),personId:x.personId||'',amount:+x.amount||0,currency:C[x.currency]?x.currency:'TWD',note:x.note||''})):[],links:Array.isArray(t.links)?t.links.map(x=>({id:x.id||id(),createdAt:x.createdAt||new Date().toISOString(),date:x.date||today(),type:linkTypes.includes(x.type)?x.type:'其他',title:x.title||'未命名連結',url:x.url||'',note:x.note||''})):[]}}
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.trips)){const trips=s.trips.map(normTrip);return{app:'米兔分帳小幫手',version:'1.2.6',...s,trips,currentTripId:trips.some(t=>t.id===s.currentTripId)?s.currentTripId:trips[0].id}}}catch(e){}try{const o=JSON.parse(localStorage.getItem(OLD));if(o&&Array.isArray(o.people)&&Array.isArray(o.expenses)){const t=normTrip({name:'舊版匯入行程',people:o.people,expenses:o.expenses});return{app:'米兔分帳小幫手',version:'1.2.6',currentTripId:t.id,trips:[t]}}}catch(e){}const t=makeTrip('大邱三日行');return{app:'米兔分帳小幫手',version:'1.2.6',currentTripId:t.id,trips:[t]}}
-let state=load(), payerMode='person';
-function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}function trip(){let t=state.trips.find(x=>x.id===state.currentTripId);if(!t){t=state.trips[0]||makeTrip('新行程');state.trips=[t];state.currentTripId=t.id}return t}function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2200)}function pName(pid,t=trip()){return t.people.find(p=>p.id===pid)?.name||'已刪除旅伴'}function money(v,cur='TWD'){const c=C[cur]||C.TWD,n=+v||0;return c.symbol+n.toLocaleString('zh-TW',{maximumFractionDigits:c.decimals,minimumFractionDigits:c.decimals})}function round(v,cur){const d=C[cur]?.decimals||0,f=10**d;return Math.round((+v||0)*f)/f}function zero(v,cur){return Math.abs(round(v,cur))<(C[cur]?.decimals?0.005:0.5)}function sortD(a,b){return(b.date||'').localeCompare(a.date||'')||(b.createdAt||'').localeCompare(a.createdAt||'')}function validUrl(u){return!u||/^https?:\/\//i.test(u)}
-function compute(t=trip()){const balances={},rem={},shortage={};t.people.forEach(p=>{balances[p.id]={};Object.keys(C).forEach(cur=>balances[p.id][cur]={paid:0,owed:0,balance:0})});Object.keys(C).forEach(cur=>{const ledger=t.poolContributions.filter(x=>x.currency===cur&&balances[x.personId]).map(x=>({personId:x.personId,remaining:+x.amount||0}));for(const ex of t.expenses.filter(x=>x.payerType==='pool'&&x.currency===cur)){let amount=+ex.amount||0,total=ledger.reduce((s,x)=>s+x.remaining,0);if(total<=0){shortage[cur]=(shortage[cur]||0)+amount;continue}if(amount>=total){ledger.forEach(e=>{balances[e.personId][cur].paid+=e.remaining;e.remaining=0});shortage[cur]=(shortage[cur]||0)+(amount-total)}else{let used=0,active=ledger.filter(x=>x.remaining>0);active.forEach((e,i)=>{let use=i===active.length-1?amount-used:amount*(e.remaining/total);e.remaining-=use;used+=use;balances[e.personId][cur].paid+=use})}}const by={};ledger.forEach(e=>{if(e.remaining>0)by[e.personId]=(by[e.personId]||0)+e.remaining});rem[cur]={total:Object.values(by).reduce((a,b)=>a+b,0),byPerson:by}});for(const ex of t.expenses){const amount=+ex.amount||0;if(ex.payerType!=='pool'&&balances[ex.payerId])balances[ex.payerId][ex.currency].paid+=amount;const sh=(ex.sharerIds||[]).filter(x=>balances[x]);if(sh.length){const each=amount/sh.length;sh.forEach(pid=>balances[pid][ex.currency].owed+=each)}}Object.values(balances).forEach(x=>Object.entries(x).forEach(([cur,b])=>b.balance=b.paid-b.owed));const settlements={};Object.keys(C).forEach(cur=>settlements[cur]=settle(balances,cur));return{balances,poolRemainder:rem,poolShortage:shortage,settlements}}
-function settle(bal,cur){const d=[],c=[];Object.entries(bal).forEach(([pid,by])=>{const v=round(by[cur].balance,cur);if(zero(v,cur))return;v<0?d.push({id:pid,amount:-v}):c.push({id:pid,amount:v})});d.sort((a,b)=>b.amount-a.amount);c.sort((a,b)=>b.amount-a.amount);const out=[];let i=0,j=0;while(i<d.length&&j<c.length){const a=round(Math.min(d[i].amount,c[j].amount),cur);if(!zero(a,cur))out.push({from:d[i].id,to:c[j].id,amount:a,currency:cur});d[i].amount=round(d[i].amount-a,cur);c[j].amount=round(c[j].amount-a,cur);if(zero(d[i].amount,cur))i++;if(zero(c[j].amount,cur))j++}return out}
-function fillCur(sel,all=false){const v=sel.value;sel.innerHTML='';if(all)sel.append(E('option',{value:'',text:'全部幣別'}));Object.entries(C).forEach(([k,c])=>sel.append(E('option',{value:k,text:c.name+' '+k})));if([...sel.options].some(o=>o.value===v))sel.value=v}
-function render(){renderTripSelect();renderStats();renderTrips();renderPeople();renderPool();renderExpenseForm();renderExpenses();renderSearch();renderLinks();renderLedger();renderSettlement()}function renderTripSelect(){const s=$('currentTripSelect');s.innerHTML='';state.trips.forEach(t=>s.append(E('option',{value:t.id,text:t.name})));s.value=state.currentTripId;$('tripNameEdit').value=trip().name}
-function renderStats(){const t=trip(),stats=[['行程',state.trips.length+' 個'],['旅伴',t.people.length+' 人'],['支出',t.expenses.length+' 筆'],['連結',t.links.length+t.expenses.filter(e=>e.receiptUrl).length+' 個']];$('statusbar').innerHTML='';stats.forEach(([a,b])=>$('statusbar').append(E('div',{class:'stat'},[E('div',{class:'label',text:a}),E('div',{class:'value',text:b})])))}
-function delTrip(t){if(state.trips.length<=1)return toast('至少要保留一個行程');if(confirm('確定刪除「'+t.name+'」？')){state.trips=state.trips.filter(x=>x.id!==t.id);if(state.currentTripId===t.id)state.currentTripId=state.trips[0].id;save();toast('已刪除行程')}}
-function renderTrips(){const box=$('tripList');box.innerHTML='';state.trips.forEach(t=>{const is=t.id===state.currentTripId,input=E('input',{class:'grow',value:t.name});const saveName=()=>{const n=input.value.trim();if(!n){input.value=t.name;return toast('行程名稱不可空白')}t.name=n;save();toast('已更新行程名稱')};input.addEventListener('keydown',e=>{if(e.key==='Enter')saveName()});const sw=E('button',{class:is?'btn small':'btn secondary small',text:is?'使用中':'切換',onclick:()=>{state.currentTripId=t.id;save();toast('已切換行程')}}),sv=E('button',{class:'btn secondary small',text:'儲存名稱',onclick:saveName}),del=E('button',{class:'btn danger small',text:'刪除',onclick:()=>delTrip(t)});box.append(E('div',{class:'item'},[E('div',{class:'item-top'},[E('div',{class:'grow'},[input,E('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})]),E('div',{class:'row wrap'},[sw,sv,del])])]))});const r=$('recentExpenses');r.innerHTML='';const recent=[...trip().expenses].sort(sortD).slice(0,5);if(!recent.length)r.append(E('div',{class:'empty',text:'目前行程還沒有支出。'}));recent.forEach(e=>r.append(expenseItem(e,false)))}
-function renderPeople(){const t=trip(),box=$('peopleList');box.innerHTML='';const used=new Set([...t.expenses.flatMap(e=>[e.payerId,...(e.sharerIds||[])]),...t.poolContributions.map(p=>p.personId)]);t.people.forEach((p,i)=>{const input=E('input',{value:p.name}),del=E('button',{class:'btn danger small',text:'刪除'});input.addEventListener('change',()=>{const n=input.value.trim();if(!n){input.value=p.name;return toast('姓名不可空白')}p.name=n;save();toast('已更新旅伴姓名')});del.addEventListener('click',()=>{if(used.has(p.id))return toast('這位旅伴已被使用，不能直接刪除');if(confirm('確定刪除「'+p.name+'」？')){t.people.splice(i,1);save()}});box.append(E('div',{class:'item'},[E('div',{class:'row'},[input,del])]))});if(!t.people.length)box.append(E('div',{class:'empty',text:'尚未新增旅伴。'}))}
-function renderPool(){const t=trip(),ps=$('poolPerson');ps.innerHTML='';t.people.forEach(p=>ps.append(E('option',{value:p.id,text:p.name})));fillCur($('poolCurrency'));const c=compute(t),bal=$('poolBalanceList');bal.innerHTML='';let any=false;Object.entries(C).forEach(([cur,info])=>{const r=c.poolRemainder[cur],sh=c.poolShortage[cur]||0;if(zero(r.total,cur)&&zero(sh,cur))return;any=true;const d=Object.entries(r.byPerson).filter(([,v])=>!zero(v,cur)).map(([pid,v])=>pName(pid,t)+'：'+money(v,cur)).join('｜')||'無剩餘歸屬';bal.append(E('div',{class:'item'},[E('div',{class:'item-title',text:info.name+'現金池：'+money(r.total,cur)}),E('div',{class:'item-meta',text:d}),!zero(sh,cur)?E('div',{class:'warn',text:'現金池不足 '+money(sh,cur)}):document.createTextNode('')]))});if(!any)bal.append(E('div',{class:'empty',text:'目前現金池沒有餘額。'}));const list=$('poolList');list.innerHTML='';[...t.poolContributions].sort(sortD).forEach(rec=>{const del=E('button',{class:'btn danger small',text:'刪除',onclick:()=>{if(confirm('確定刪除這筆現金池紀錄？')){t.poolContributions=t.poolContributions.filter(x=>x.id!==rec.id);save()}}});list.append(E('div',{class:'item'},[E('div',{class:'item-top'},[E('div',{},[E('div',{class:'item-title',text:pName(rec.personId,t)+' 放入 '+money(rec.amount,rec.currency)}),E('div',{class:'item-meta',text:rec.date+(rec.note?'｜'+rec.note:'')})]),del])]))});if(!t.poolContributions.length)list.append(E('div',{class:'empty',text:'尚未加入現金池紀錄。'}))}
-function renderExpenseForm(){const t=trip();fillCur($('expenseCurrency'));const cat=$('expenseCategory'),cv=cat.value;cat.innerHTML='';cats.forEach(c=>cat.append(E('option',{value:c,text:c})));if(cv)cat.value=cv;const payer=$('expensePayer'),pv=payer.value;payer.innerHTML='';t.people.forEach(p=>payer.append(E('option',{value:p.id,text:p.name})));if(pv)payer.value=pv;const sh=$('sharerList'),prev=new Set($$('#sharerList input:checked').map(i=>i.value));sh.innerHTML='';t.people.forEach(p=>{const input=E('input',{type:'checkbox',value:p.id,checked:prev.size?prev.has(p.id):true});const lab=E('label',{class:'pill active'},[input,document.createTextNode(p.name)]);input.addEventListener('change',()=>lab.classList.toggle('active',input.checked));if(!input.checked)lab.classList.remove('active');sh.append(lab)});$('payerPersonMode').classList.toggle('active',payerMode==='person');$('payerPoolMode').classList.toggle('active',payerMode==='pool');$('payerPersonBox').style.display=payerMode==='person'?'block':'none';$('payerPoolBox').style.display=payerMode==='pool'?'block':'none'}
-function expenseItem(ex,allowDelete){const t=trip(),sh=(ex.sharerIds||[]).map(pid=>pName(pid,t)).join('、'),payer=ex.payerType==='pool'?'現金池':pName(ex.payerId,t);const n=E('div',{class:'item'},[E('div',{class:'item-top'},[E('div',{},[E('div',{class:'item-title',text:ex.title}),E('div',{class:'item-meta',text:`${ex.date}｜${ex.category}｜${payer} 支付｜分攤：${sh||'無'}`})]),E('div',{class:'right'},[E('span',{class:'badge '+(ex.payerType==='pool'?'pool':'person'),text:ex.payerType==='pool'?'現金池':'旅伴'}),E('div',{class:'money',text:money(ex.amount,ex.currency)})])])]);if(ex.receiptUrl)n.append(E('a',{class:'link',href:ex.receiptUrl,target:'_blank',rel:'noopener',text:'開啟收據／票券連結'}));if(ex.note)n.append(E('div',{class:'item-meta',text:'備註：'+ex.note}));if(allowDelete)n.append(E('button',{class:'btn danger small',text:'刪除這筆',onclick:()=>{if(confirm('確定刪除「'+ex.title+'」？')){t.expenses=t.expenses.filter(e=>e.id!==ex.id);save()}}}));return n}
-function renderExpenses(){const box=$('expensesList');box.innerHTML='';const arr=[...trip().expenses].sort(sortD);if(!arr.length)return box.append(E('div',{class:'empty',text:'費用會列在這裡。'}));arr.forEach(e=>box.append(expenseItem(e,true)))}
-function renderSearch(){const t=trip(),s=$('searchDate'),old=s.value;const dates=[...new Set(t.expenses.map(e=>e.date).filter(Boolean))].sort().reverse();s.innerHTML='';s.append(E('option',{value:'',text:'全部日期'}));dates.forEach(d=>s.append(E('option',{value:d,text:d})));if([...s.options].some(o=>o.value===old))s.value=old;const kw=($('searchKeyword').value||'').trim().toLowerCase(),date=s.value;const arr=t.expenses.filter(e=>(!date||e.date===date)&&(!kw||[e.title,e.category,e.note,pName(e.payerId,t),...(e.sharerIds||[]).map(pid=>pName(pid,t)),e.payerType==='pool'?'現金池':''].join(' ').toLowerCase().includes(kw))).sort(sortD);const box=$('searchResult');box.innerHTML='';if(!arr.length)box.append(E('div',{class:'empty',text:'沒有符合條件的支出。'}));arr.forEach(e=>box.append(expenseItem(e,false)))}
-function renderLinks(){const ts=$('linkType'),old=ts.value;ts.innerHTML='';linkTypes.forEach(x=>ts.append(E('option',{value:x,text:x})));if(old)ts.value=old;const t=trip(),list=$('linkList');list.innerHTML='';const links=[...t.links.map(x=>({...x,expense:false})),...t.expenses.filter(e=>e.receiptUrl).map(e=>({id:e.id,date:e.date,type:'支出收據',title:e.title,url:e.receiptUrl,note:e.note,expense:true}))].sort(sortD);if(!links.length)return list.append(E('div',{class:'empty',text:'尚未儲存雲端連結。'}));links.forEach(l=>{const children=[E('div',{class:'item-top'},[E('div',{},[E('div',{class:'item-title',text:l.title}),E('div',{class:'item-meta',text:`${l.date}｜${l.type}${l.note?'｜'+l.note:''}`})]),E('a',{class:'btn secondary small',href:l.url,target:'_blank',rel:'noopener',text:'開啟'})])];if(!l.expense)children.push(E('button',{class:'btn danger small',text:'刪除',onclick:()=>{if(confirm('確定刪除這個連結？')){t.links=t.links.filter(x=>x.id!==l.id);save()}}}));list.append(E('div',{class:'item'},children))})}
-function buildLedger(t,pid,comp){const totals={};Object.keys(C).forEach(cur=>totals[cur]={directPaid:0,poolIn:0,out:0,share:0,remainder:0,balance:comp.balances[pid]?.[cur]?.balance||0});const entries=[];t.poolContributions.filter(x=>x.personId===pid).forEach(x=>{totals[x.currency].poolIn+=x.amount;totals[x.currency].out+=x.amount;entries.push({date:x.date,title:'現金池出資',role:'放入現金池',out:x.amount,share:0,currency:x.currency})});t.expenses.forEach(e=>{const sh=(e.sharerIds||[]).includes(pid),paid=e.payerType!=='pool'&&e.payerId===pid,each=(e.sharerIds||[]).length?e.amount/e.sharerIds.length:0;if(paid){totals[e.currency].directPaid+=e.amount;totals[e.currency].out+=e.amount}if(sh)totals[e.currency].share+=each;if(paid||sh)entries.push({date:e.date,title:e.title,role:[paid?'先付款':'',sh?'個人分攤':''].filter(Boolean).join('＋'),out:paid?e.amount:0,share:sh?each:0,currency:e.currency})});Object.entries(comp.poolRemainder).forEach(([cur,r])=>totals[cur].remainder=r.byPerson[pid]||0);return{totals,entries:entries.sort(sortD)}}
-function renderLedger(){const t=trip(),ps=$('ledgerPerson'),oldP=ps.value;ps.innerHTML='';ps.append(E('option',{value:'',text:'全部旅伴'}));t.people.forEach(p=>ps.append(E('option',{value:p.id,text:p.name})));if([...ps.options].some(o=>o.value===oldP))ps.value=oldP;fillCur($('ledgerCurrency'),true);const cur=$('ledgerCurrency').value,people=t.people.filter(p=>!ps.value||p.id===ps.value),comp=compute(t),box=$('ledgerList');box.innerHTML='';if(!t.people.length)return box.append(E('div',{class:'empty',text:'尚未新增旅伴。'}));people.forEach(p=>{const l=buildLedger(t,p.id,comp);const currencies=cur?[cur]:Object.keys(C);const totals=[];currencies.forEach(c=>{const x=l.totals[c];if(!x||[x.directPaid,x.poolIn,x.out,x.share,x.remainder,x.balance].every(v=>zero(v,c)))return;totals.push(E('div',{class:'ledger-total'},[E('div',{class:'label',text:C[c].name}),E('div',{class:'value',text:'實付 '+money(x.out,c)}),E('div',{class:'item-meta',text:'先付 '+money(x.directPaid,c)+'｜現金池 '+money(x.poolIn,c)}),E('div',{class:'item-meta',text:'分攤 '+money(x.share,c)+'｜剩餘 '+money(x.remainder,c)}),E('div',{class:'item-meta',text:(x.balance>=0?'應收 ':'應付 ')+money(Math.abs(x.balance),c)})]))});const entries=l.entries.filter(e=>!cur||e.currency===cur);const children=[E('h3',{text:p.name}),E('div',{class:'grid two'},totals.length?totals:[E('div',{class:'empty',text:'這個篩選條件下沒有帳簿金額。'})])];if(entries.length){const tb=E('tbody');entries.forEach(e=>tb.append(E('tr',{},[E('td',{text:e.date}),E('td',{text:e.title}),E('td',{},[E('span',{class:'role-tag',text:e.role})]),E('td',{text:e.out?money(e.out,e.currency):'-'}),E('td',{text:e.share?money(e.share,e.currency):'-'})])));children.push(E('div',{class:'table-wrap'},[E('table',{},[E('thead',{},[E('tr',{},['日期','項目','角色','付出','個人分攤'].map(x=>E('th',{text:x})))]),tb])]))}else children.push(E('div',{class:'empty',text:'沒有相關明細。'}));box.append(E('div',{class:'ledger-person'},children))})}
-function renderSettlement(){const t=trip(),c=compute(t),box=$('settlementList'),bal=$('balancesList'),rem=$('poolRemainderList');box.innerHTML='';bal.innerHTML='';rem.innerHTML='';let any=false;Object.entries(C).forEach(([cur,info])=>{const list=c.settlements[cur],sh=c.poolShortage[cur]||0;if(!list.length&&zero(sh,cur))return;any=true;const b=E('div',{class:'currency-block'},[E('div',{class:'currency-title',text:info.name+'結算'})]);list.forEach(s=>b.append(E('div',{class:'settle'},[E('strong',{text:pName(s.from,t)}),document.createTextNode(' 轉給 '),E('strong',{text:pName(s.to,t)}),document.createTextNode(' '+money(s.amount,cur))])));if(!zero(sh,cur))b.append(E('div',{class:'warn',text:'現金池不足 '+money(sh,cur)+'，請補登出資。'}));box.append(b)});if(!any)box.append(E('div',{class:'empty',text:'目前各幣別都已打平，不需要轉帳。'}));t.people.forEach(p=>{const parts=[];Object.keys(C).forEach(cur=>{const b=c.balances[p.id]?.[cur];if(b&&(!zero(b.paid,cur)||!zero(b.owed,cur)||!zero(b.balance,cur)))parts.push(`${C[cur].name}：先付 ${money(b.paid,cur)}｜分攤 ${money(b.owed,cur)}｜${b.balance>=0?'應收':'應付'} ${money(Math.abs(b.balance),cur)}`)});bal.append(E('div',{class:'balance'},[E('div',{class:'item-title',text:p.name}),E('div',{class:'item-meta',text:parts.join('；')||'尚無紀錄'})]))});let hr=false;Object.entries(C).forEach(([cur,info])=>{const r=c.poolRemainder[cur];if(!r||zero(r.total,cur))return;hr=true;rem.append(E('div',{class:'item'},[E('div',{class:'item-title',text:info.name+'剩餘 '+money(r.total,cur)}),E('div',{class:'item-meta',text:Object.entries(r.byPerson).map(([pid,v])=>pName(pid,t)+'：'+money(v,cur)).join('｜')})]))});if(!hr)rem.append(E('div',{class:'empty',text:'現金池沒有剩餘歸屬。'}))}
-function resetExpense(){ $('expenseDate').value=today();$('expenseTitle').value='';$('expenseAmount').value='';$('expenseCurrency').value='TWD';$('expenseCategory').value='餐食';$('expenseReceiptUrl').value='';$('expenseNote').value='';payerMode='person';renderExpenseForm()}function resetPool(){ $('poolDate').value=today();$('poolAmount').value='';$('poolCurrency').value='TWD';$('poolNote').value=''}function resetLink(){ $('linkDate').value=today();$('linkTitle').value='';$('linkUrl').value='';$('linkNote').value='';$('linkType').value='收據'}function exportJSON(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=E('a',{href:url,download:name});document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)}function settlementText(){const t=trip(),c=compute(t),lines=['【'+t.name+'｜米兔分帳結算】',''];let any=false;Object.entries(C).forEach(([cur,info])=>{const list=c.settlements[cur],sh=c.poolShortage[cur]||0;if(!list.length&&zero(sh,cur))return;any=true;lines.push('【'+info.name+'】');list.forEach(s=>lines.push(pName(s.from,t)+' → '+pName(s.to,t)+'：'+money(s.amount,cur)));if(!zero(sh,cur))lines.push('⚠ 現金池不足：'+money(sh,cur));lines.push('')});if(!any)lines.push('目前各幣別都已打平，不需要轉帳。');return lines.join('\n')}
-$$('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));$$('[data-jump]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.jump)));function switchTab(tab){$$('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+tab));window.scrollTo({top:0,behavior:'smooth'})}
-$('currentTripSelect').addEventListener('change',e=>{state.currentTripId=e.target.value;save();toast('已切換行程')});$('addTripBtn').addEventListener('click',()=>{const n=$('newTripName').value.trim();if(!n)return toast('請輸入行程名稱');const t=makeTrip(n);state.trips.push(t);state.currentTripId=t.id;$('newTripName').value='';save()});$('newTripName').addEventListener('keydown',e=>{if(e.key==='Enter')$('addTripBtn').click()});$('renameTripBtn').addEventListener('click',()=>{const n=$('tripNameEdit').value.trim();if(!n)return toast('行程名稱不可空白');trip().name=n;save();toast('已更新行程名稱')});$('addPersonBtn').addEventListener('click',()=>{const n=$('personName').value.trim(),t=trip();if(!n)return toast('請輸入旅伴姓名');if(t.people.some(p=>p.name===n))return toast('這個名字已經存在');t.people.push({id:id(),name:n});$('personName').value='';save()});$('personName').addEventListener('keydown',e=>{if(e.key==='Enter')$('addPersonBtn').click()});$('savePoolBtn').addEventListener('click',()=>{const t=trip(),amount=+$('poolAmount').value;if(!$('poolPerson').value)return toast('請先新增旅伴');if(!amount||amount<=0)return toast('請輸入正確金額');t.poolContributions.push({id:id(),createdAt:new Date().toISOString(),date:$('poolDate').value||today(),personId:$('poolPerson').value,amount,currency:$('poolCurrency').value,note:$('poolNote').value.trim()});save();resetPool()});$('payerPersonMode').addEventListener('click',()=>{payerMode='person';renderExpenseForm()});$('payerPoolMode').addEventListener('click',()=>{payerMode='pool';renderExpenseForm()});$('selectAllSharers').addEventListener('click',()=>$$('#sharerList input').forEach(i=>{i.checked=true;i.parentElement.classList.add('active')}));$('clearSharers').addEventListener('click',()=>$$('#sharerList input').forEach(i=>{i.checked=false;i.parentElement.classList.remove('active')}));$('saveExpenseBtn').addEventListener('click',()=>{const t=trip(),amount=+$('expenseAmount').value,title=$('expenseTitle').value.trim(),sharerIds=$$('#sharerList input:checked').map(i=>i.value),url=$('expenseReceiptUrl').value.trim();if(!t.people.length)return toast('請先新增旅伴');if(!title)return toast('請輸入項目名稱');if(!amount||amount<=0)return toast('請輸入正確金額');if(!sharerIds.length)return toast('至少要選一位分攤者');if(!validUrl(url))return toast('連結請用 http 或 https 開頭');t.expenses.push({id:id(),createdAt:new Date().toISOString(),date:$('expenseDate').value||today(),title,amount,currency:$('expenseCurrency').value,category:$('expenseCategory').value,payerType:payerMode,payerId:payerMode==='person' ? $('expensePayer').value : '',sharerIds,note:$('expenseNote').value.trim(),receiptUrl:url});save();resetExpense()});$('resetExpenseFormBtn').addEventListener('click',resetExpense);$('searchDate').addEventListener('change',renderSearch);$('searchKeyword').addEventListener('input',renderSearch);$('ledgerPerson').addEventListener('change',renderLedger);$('ledgerCurrency').addEventListener('change',renderLedger);$('saveLinkBtn').addEventListener('click',()=>{const t=trip(),title=$('linkTitle').value.trim(),url=$('linkUrl').value.trim();if(!title)return toast('請輸入連結名稱');if(!url||!validUrl(url))return toast('請輸入 http 或 https 開頭的連結');t.links.push({id:id(),createdAt:new Date().toISOString(),date:$('linkDate').value||today(),type:$('linkType').value,title,url,note:$('linkNote').value.trim()});save();resetLink()});$('copySettlementBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(settlementText());toast('已複製結算文字')}catch(e){toast('複製失敗')}});$('exportAllBtn').addEventListener('click',()=>exportJSON(state,'米兔分帳全部行程_'+today()+'.json'));$('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},'米兔分帳_'+trip().name+'_'+today()+'.json'));$('importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const data=JSON.parse(await f.text());if(Array.isArray(data.trips)){state={app:'米兔分帳小幫手',version:'1.2.6',currentTripId:data.currentTripId,trips:data.trips.map(normTrip)};if(!state.trips.some(t=>t.id===state.currentTripId))state.currentTripId=state.trips[0]?.id}else if(data.trip){const im=normTrip(data.trip);state.trips.push(im);state.currentTripId=im.id}else throw Error('format');save();toast('已匯入 JSON')}catch(err){toast('匯入失敗，檔案格式不正確')}finally{e.target.value=''}});$('deleteTripBtn').addEventListener('click',()=>delTrip(trip()));$('wipeBtn').addEventListener('click',()=>{if(confirm('確定清除所有資料？')){localStorage.removeItem(KEY);state=load();resetExpense();resetPool();resetLink();save()}});if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));resetExpense();resetPool();resetLink();render();
+(() => {
+  const STORAGE_KEY = 'mituTravelSplit.v1_1';
+  const OLD_STORAGE_KEY = 'mituTravelSplit.v1';
+  const todayISO = () => new Date().toISOString().slice(0,10);
+  const newId = () => (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  const currencies = {
+    TWD:{name:'台幣',symbol:'NT$',decimals:0}, JPY:{name:'日圓',symbol:'¥',decimals:0},
+    KRW:{name:'韓幣',symbol:'₩',decimals:0}, USD:{name:'美金',symbol:'US$',decimals:2}
+  };
+  const categories = ['餐食','交通','門票','住宿','購物','票券','其他'];
+  const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
+  const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
+  const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[]});
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.0',currentTripId:trip.id,trips:[trip]}; };
+  let state = loadState();
+  let payerMode = 'person';
+  let shareMode = 'equal';
+  let editingExpenseId = null;
+  let editingPoolId = null;
+  let editingLinkId = null;
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs={}, children=[]) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k,v]) => {
+      if(v === undefined || v === null) return;
+      if(k === 'class') node.className = v;
+      else if(k === 'text') node.textContent = v;
+      else if(k === 'html') node.innerHTML = v;
+      else if(k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2), v);
+      else node.setAttribute(k, v);
+    });
+    children.forEach(child => node.append(child));
+    return node;
+  };
+
+  function normalizeCustomShares(customShares, sharerIds=[]){
+    const result = {};
+    if(customShares && typeof customShares === 'object'){
+      Object.entries(customShares).forEach(([id,value])=>{ const amount=Number(value)||0; if(amount>0) result[id]=amount; });
+    }
+    return result;
+  }
+
+  function normalizeTrip(t){
+    return {
+      id:t.id || newId(), name:t.name || '未命名行程',
+      people:Array.isArray(t.people) && t.people.length ? t.people.map(p=>({id:p.id||newId(),name:p.name||'未命名'})) : defaultPeople(),
+      expenses:Array.isArray(t.expenses) ? t.expenses.map(ex=>({
+        id:ex.id||newId(), createdAt:ex.createdAt||new Date().toISOString(), date:ex.date||todayISO(), title:ex.title||'未命名項目',
+        amount:Number(ex.amount)||0, currency:currencies[ex.currency]?ex.currency:'TWD', category:ex.category||'其他',
+        payerType:ex.payerType === 'pool' ? 'pool' : 'person', payerId:ex.payerId || '', sharerIds:Array.isArray(ex.sharerIds)?ex.sharerIds:[],
+        splitMode:ex.splitMode === 'custom' ? 'custom' : 'equal', customShares:normalizeCustomShares(ex.customShares, ex.sharerIds),
+        note:ex.note||'', receiptUrl:ex.receiptUrl||''
+      })) : [],
+      poolContributions:Array.isArray(t.poolContributions) ? t.poolContributions.map(p=>({
+        id:p.id||newId(), createdAt:p.createdAt||new Date().toISOString(), date:p.date||todayISO(), personId:p.personId||'', amount:Number(p.amount)||0,
+        currency:currencies[p.currency]?p.currency:'TWD', note:p.note||''
+      })) : [],
+      links:Array.isArray(t.links) ? t.links.map(l=>({
+        id:l.id||newId(), createdAt:l.createdAt||new Date().toISOString(), date:l.date||todayISO(), type:linkTypes.includes(l.type)?l.type:'其他', title:l.title||'未命名連結', url:l.url||'', note:l.note||''
+      })) : []
+    };
+  }
+  function loadState(){
+    try{
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if(saved && Array.isArray(saved.trips)){
+        const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
+        const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.0',...saved,trips,currentTripId};
+      }
+    }catch(err){ console.warn(err); }
+    try{
+      const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
+      if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
+        const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
+        return {app:'米兔分帳小幫手',version:'1.4.0',currentTripId:trip.id,trips:[trip]};
+      }
+    }catch(err){ console.warn(err); }
+    return defaultState();
+  }
+  function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); render(); }
+  function trip(){
+    let t = state.trips.find(x=>x.id===state.currentTripId);
+    if(!t){ t = state.trips[0] || makeTrip('新行程'); state.trips = [t]; state.currentTripId = t.id; }
+    return t;
+  }
+  function deleteTripById(id){
+    if(state.trips.length<=1) return toast('至少要保留一個行程');
+    const target = state.trips.find(x=>x.id===id);
+    if(!target) return toast('找不到這個行程');
+    const msg = `確定刪除「${target.name}」？\n這會一起刪除該行程的旅伴、支出、現金池與連結。`;
+    if(!confirm(msg)) return;
+    state.trips = state.trips.filter(x=>x.id!==id);
+    if(state.currentTripId===id) state.currentTripId = state.trips[0].id;
+    saveState();
+    toast('已刪除行程');
+  }
+  function personName(id, t=trip()){ return t.people.find(p=>p.id===id)?.name || '已刪除旅伴'; }
+  function money(value,currency='TWD'){
+    const c = currencies[currency] || currencies.TWD;
+    const n = Number(value)||0;
+    return c.symbol + n.toLocaleString('zh-TW',{maximumFractionDigits:c.decimals,minimumFractionDigits:c.decimals});
+  }
+  function signedMoney(value,currency){ const n=Number(value)||0; return (n<0?'-':'') + money(Math.abs(n),currency); }
+  function roundCurrency(value,currency){ const d = currencies[currency]?.decimals ?? 0; const f = Math.pow(10,d); return Math.round((Number(value)||0)*f)/f; }
+  function isZero(value,currency){ return Math.abs(roundCurrency(value,currency)) < (currencies[currency]?.decimals ? 0.005 : 0.5); }
+  function toast(message){ const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
+  function validUrl(url){ return !url || /^https?:\/\//i.test(url); }
+
+  function compute(t=trip()){
+    const balances = {};
+    const initPerson = p => { balances[p.id] = {}; Object.keys(currencies).forEach(c => balances[p.id][c] = {paid:0,owed:0,balance:0}); };
+    t.people.forEach(initPerson);
+    const poolRemainder = {}; const poolShortage = {}; const usedPoolByExpense = {};
+    Object.keys(currencies).forEach(currency => {
+      const ledger = t.poolContributions.filter(x=>x.currency===currency && balances[x.personId]).sort(sortByDate).map(x=>({personId:x.personId,remaining:Number(x.amount)||0,sourceId:x.id}));
+      const poolExpenses = t.expenses.filter(x=>x.payerType==='pool' && x.currency===currency).sort(sortByDate);
+      for(const ex of poolExpenses){
+        let amount = Number(ex.amount)||0;
+        usedPoolByExpense[ex.id] = [];
+        let total = ledger.reduce((sum,x)=>sum+x.remaining,0);
+        if(total <= 0){ poolShortage[currency] = (poolShortage[currency]||0) + amount; continue; }
+        if(amount >= total){
+          ledger.forEach(entry => {
+            if(entry.remaining > 0){
+              balances[entry.personId][currency].paid += entry.remaining;
+              usedPoolByExpense[ex.id].push({personId:entry.personId,amount:entry.remaining});
+              entry.remaining = 0;
+            }
+          });
+          poolShortage[currency] = (poolShortage[currency]||0) + (amount - total);
+        }else{
+          let allocated = 0;
+          const active = ledger.filter(x=>x.remaining>0);
+          active.forEach((entry,idx) => {
+            let use = idx === active.length-1 ? amount - allocated : amount * (entry.remaining / total);
+            use = Math.max(0,use);
+            entry.remaining -= use;
+            allocated += use;
+            balances[entry.personId][currency].paid += use;
+            usedPoolByExpense[ex.id].push({personId:entry.personId,amount:use});
+          });
+        }
+      }
+      const remainderByPerson = {};
+      ledger.forEach(entry => { if(entry.remaining > 0) remainderByPerson[entry.personId] = (remainderByPerson[entry.personId]||0) + entry.remaining; });
+      poolRemainder[currency] = {total:Object.values(remainderByPerson).reduce((a,b)=>a+b,0), byPerson:remainderByPerson};
+    });
+    for(const ex of t.expenses){
+      const amount = Number(ex.amount)||0;
+      if(ex.payerType !== 'pool' && balances[ex.payerId]) balances[ex.payerId][ex.currency].paid += amount;
+      if(ex.splitMode === 'custom' && ex.customShares){
+        Object.entries(ex.customShares).forEach(([id,share])=>{ if(balances[id]) balances[id][ex.currency].owed += Number(share)||0; });
+      }else{
+        const sharers = (ex.sharerIds||[]).filter(id => balances[id]);
+        if(sharers.length){
+          const each = amount / sharers.length;
+          sharers.forEach(id => balances[id][ex.currency].owed += each);
+        }
+      }
+    }
+    Object.values(balances).forEach(byCur => Object.entries(byCur).forEach(([cur,b]) => b.balance = b.paid - b.owed));
+    const settlements = {};
+    Object.keys(currencies).forEach(cur => settlements[cur] = settleCurrency(balances,cur));
+    return {balances,settlements,poolRemainder,poolShortage,usedPoolByExpense};
+  }
+  function settleCurrency(balances,currency){
+    const debtors=[]; const creditors=[];
+    Object.entries(balances).forEach(([id,byCur]) => {
+      const bal = roundCurrency(byCur[currency]?.balance || 0,currency);
+      if(isZero(bal,currency)) return;
+      if(bal < 0) debtors.push({id,amount:-bal}); else creditors.push({id,amount:bal});
+    });
+    debtors.sort((a,b)=>b.amount-a.amount); creditors.sort((a,b)=>b.amount-a.amount);
+    const result=[]; let i=0,j=0;
+    while(i<debtors.length && j<creditors.length){
+      let amount = roundCurrency(Math.min(debtors[i].amount,creditors[j].amount),currency);
+      if(!isZero(amount,currency)) result.push({from:debtors[i].id,to:creditors[j].id,amount,currency});
+      debtors[i].amount = roundCurrency(debtors[i].amount - amount,currency);
+      creditors[j].amount = roundCurrency(creditors[j].amount - amount,currency);
+      if(isZero(debtors[i].amount,currency)) i++;
+      if(isZero(creditors[j].amount,currency)) j++;
+    }
+    return result;
+  }
+  function sortByDate(a,b){ return (a.date||'').localeCompare(b.date||'') || (a.createdAt||'').localeCompare(b.createdAt||''); }
+  function sortDesc(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''); }
+
+  function render(){ renderTripSelect(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlement(); }
+  function renderTripSelect(){
+    const sel=$('currentTripSelect'); const current=state.currentTripId; sel.innerHTML='';
+    state.trips.forEach(t => sel.append(el('option',{value:t.id,text:t.name})));
+    sel.value = current;
+    $('tripNameEdit').value = trip().name;
+  }
+  function renderStatusbar(){
+    const t=trip(); const pool=compute(t).poolRemainder; const activePool = Object.entries(pool).filter(([,v])=>!isZero(v.total,'TWD')).length;
+    const stats = [['行程', `${state.trips.length} 個`], ['旅伴', `${t.people.length} 人`], ['支出', `${t.expenses.length} 筆`], ['連結', `${t.links.length + t.expenses.filter(e=>e.receiptUrl).length} 個`]];
+    $('statusbar').innerHTML=''; stats.forEach(([label,value]) => $('statusbar').append(el('div',{class:'stat'},[el('div',{class:'label',text:label}),el('div',{class:'value',text:value})])));
+  }
+  function renderTrips(){
+    const box=$('tripList'); box.innerHTML='';
+    state.trips.forEach(t => {
+      const isCurrent = t.id===state.currentTripId;
+      const input = el('input',{class:'trip-name-input',type:'text',value:t.name,'aria-label':'行程名稱'});
+      const saveName = el('button',{class:'btn secondary small',text:'儲存名稱'});
+      const commitName = () => {
+        const name = input.value.trim();
+        if(!name){ input.value=t.name; return toast('行程名稱不可空白'); }
+        if(name===t.name) return toast('名稱沒有變更');
+        t.name = name;
+        saveState();
+        toast('已更新行程名稱');
+      };
+      input.addEventListener('keydown',e=>{ if(e.key==='Enter') commitName(); });
+      saveName.addEventListener('click',commitName);
+      const btn = el('button',{class:isCurrent?'btn small':'btn secondary small',text:isCurrent?'使用中':'切換'});
+      btn.addEventListener('click',()=>{state.currentTripId=t.id; saveState(); toast('已切換行程');});
+      const del = el('button',{class:'btn danger small',text:'刪除'});
+      del.addEventListener('click',()=>deleteTripById(t.id));
+      box.append(el('div',{class:'item'},[
+        el('div',{class:'item-top'},[
+          el('div',{class:'grow'},[
+            input,
+            el('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})
+          ]),
+          el('div',{class:'row wrap'},[btn,saveName,del])
+        ])
+      ]));
+    });
+    const recent=$('recentExpenses'); recent.innerHTML='';
+    const sorted=[...trip().expenses].sort(sortDesc).slice(0,5);
+    if(!sorted.length) recent.append(el('div',{class:'empty',text:'目前行程還沒有支出。'}));
+    sorted.forEach(ex=>recent.append(expenseItem(ex,false)));
+  }
+  function renderPeople(){
+    const t=trip(); const box=$('peopleList'); box.innerHTML='';
+    if(!t.people.length){ box.append(el('div',{class:'empty',text:'尚未新增旅伴。'})); return; }
+    const used = new Set([...t.expenses.flatMap(e=>[e.payerId,...(e.sharerIds||[])]), ...t.poolContributions.map(p=>p.personId)]);
+    t.people.forEach((p,idx) => {
+      const input=el('input',{type:'text',value:p.name,'aria-label':'旅伴姓名'});
+      input.addEventListener('change',()=>{ const val=input.value.trim(); if(!val){input.value=p.name; return toast('姓名不可空白');} p.name=val; saveState(); toast('已更新旅伴姓名'); });
+      const del=el('button',{class:'btn danger small',text:'刪除'});
+      del.addEventListener('click',()=>{ if(used.has(p.id)) return toast('這位旅伴已被使用，不能直接刪除。'); if(confirm(`確定刪除「${p.name}」？`)){t.people.splice(idx,1); saveState();} });
+      box.append(el('div',{class:'item'},[el('div',{class:'row'},[input,del])]));
+    });
+  }
+  function fillCurrencySelect(sel){
+    const current=sel.value; sel.innerHTML=''; Object.entries(currencies).forEach(([code,info])=>sel.append(el('option',{value:code,text:`${info.name} ${code}`}))); if(current) sel.value=current;
+  }
+  function renderPool(){
+    const t=trip(); const psel=$('poolPerson'); const current=psel.value; psel.innerHTML=''; t.people.forEach(p=>psel.append(el('option',{value:p.id,text:p.name}))); if(current) psel.value=current;
+    fillCurrencySelect($('poolCurrency'));
+    const computed=compute(t); const balBox=$('poolBalanceList'); balBox.innerHTML='';
+    let hasPool=false;
+    Object.entries(currencies).forEach(([cur,info])=>{
+      const total = computed.poolRemainder[cur]?.total || 0; const shortage = computed.poolShortage[cur] || 0;
+      if(isZero(total,cur) && isZero(shortage,cur)) return; hasPool=true;
+      const byPerson = computed.poolRemainder[cur]?.byPerson || {};
+      const details = Object.entries(byPerson).filter(([,v])=>!isZero(v,cur)).map(([id,v])=>`${personName(id,t)}：${money(v,cur)}`).join('｜') || '無剩餘歸屬';
+      const children=[el('div',{class:'item-title',text:`${info.name}現金池：${money(total,cur)}`}), el('div',{class:'item-meta',text:details})];
+      if(!isZero(shortage,cur)) children.push(el('div',{class:'warn',text:`現金池不足 ${money(shortage,cur)}，請補登誰放錢進現金池。`}));
+      balBox.append(el('div',{class:'item'},children));
+    });
+    if(!hasPool) balBox.append(el('div',{class:'empty',text:'目前現金池沒有餘額。'}));
+    const list=$('poolList'); list.innerHTML='';
+    const sorted=[...t.poolContributions].sort(sortDesc);
+    if(!sorted.length){ list.append(el('div',{class:'empty',text:'尚未加入現金池紀錄。'})); return; }
+    sorted.forEach(rec=>{
+      const edit=el('button',{class:'btn secondary small',text:'編輯'}); edit.addEventListener('click',()=>beginEditPool(rec.id)); const del=el('button',{class:'btn danger small',text:'刪除'}); del.addEventListener('click',()=>{ if(confirm('確定刪除這筆現金池紀錄？')){t.poolContributions=t.poolContributions.filter(x=>x.id!==rec.id); if(editingPoolId===rec.id) setPoolEditMode(null); saveState(); toast('已刪除現金池紀錄');} });
+      list.append(el('div',{class:'item'},[
+        el('div',{class:'item-top'},[el('div',{},[el('div',{class:'item-title',text:`${personName(rec.personId,t)} 放入 ${money(rec.amount,rec.currency)}`}), el('div',{class:'item-meta',text:`${rec.date}${rec.note?'｜'+rec.note:''}`})]), el('div',{class:'row wrap'},[edit,del])])
+      ]));
+    });
+  }
+  function renderExpenseForm(){
+    const t=trip(); fillCurrencySelect($('expenseCurrency'));
+    const cat=$('expenseCategory'); const catCur=cat.value; cat.innerHTML=''; categories.forEach(c=>cat.append(el('option',{value:c,text:c}))); if(catCur) cat.value=catCur;
+    const payer=$('expensePayer'); const curPayer=payer.value; payer.innerHTML=''; t.people.forEach(p=>payer.append(el('option',{value:p.id,text:p.name}))); if(curPayer) payer.value=curPayer;
+    const sharer=$('sharerList'); const previous = new Set([...sharer.querySelectorAll('input:checked')].map(i=>i.value)); sharer.innerHTML='';
+    t.people.forEach(p=>{ const input=el('input',{type:'checkbox',value:p.id,checked:previous.size?previous.has(p.id):true}); const wrap=el('label',{class:'pill active'},[input,document.createTextNode(p.name)]); input.addEventListener('change',()=>{wrap.classList.toggle('active',input.checked); renderCustomShareInputs();}); if(!input.checked) wrap.classList.remove('active'); sharer.append(wrap); });
+    $('payerPersonMode').classList.toggle('active',payerMode==='person'); $('payerPoolMode').classList.toggle('active',payerMode==='pool');
+    $('payerPersonBox').style.display = payerMode==='person' ? 'block' : 'none'; $('payerPoolBox').style.display = payerMode==='pool' ? 'block' : 'none';
+    $('equalSplitMode').classList.toggle('active',shareMode==='equal'); $('customSplitMode').classList.toggle('active',shareMode==='custom');
+    $('customSplitBox').style.display = shareMode==='custom' ? 'block' : 'none';
+    renderCustomShareInputs();
+  }
+  function renderCustomShareInputs(){
+    const box=$('customShareList'); const sumBox=$('customShareSum'); if(!box || !sumBox) return;
+    const previous = new Map([...box.querySelectorAll('input[data-person-id]')].map(i=>[i.dataset.personId,i.value]));
+    box.innerHTML='';
+    const t=trip(); const checked=[...document.querySelectorAll('#sharerList input:checked')].map(i=>i.value);
+    if(shareMode !== 'custom'){ sumBox.textContent=''; sumBox.classList.remove('bad'); return; }
+    if(!checked.length){ box.append(el('div',{class:'empty',text:'請先選擇分攤者。'})); sumBox.textContent=''; return; }
+    checked.forEach(id=>{
+      const input=el('input',{type:'number',inputmode:'decimal',min:'0',step:'0.01',placeholder:'0','data-person-id':id,value:previous.get(id)||''});
+      input.addEventListener('input',updateCustomShareSum);
+      box.append(el('div',{class:'split-share-row'},[el('div',{class:'person',text:personName(id,t)}),input]));
+    });
+    updateCustomShareSum();
+  }
+  function getCustomSharesFromForm(){
+    const shares={}; let sum=0;
+    document.querySelectorAll('#customShareList input[data-person-id]').forEach(input=>{
+      const amount=Number(input.value);
+      if(amount>0){ shares[input.dataset.personId]=amount; sum += amount; }
+    });
+    return {shares,sum};
+  }
+  function updateCustomShareSum(){
+    const sumBox=$('customShareSum'); if(!sumBox) return;
+    const {sum}=getCustomSharesFromForm(); const cur=$('expenseCurrency')?.value || 'TWD'; const amount=Number($('expenseAmount')?.value)||0;
+    const diff = roundCurrency(sum - amount, cur);
+    sumBox.textContent = `自訂分攤合計：${money(sum,cur)}｜總金額：${money(amount,cur)}` + (isZero(diff,cur) ? '' : `｜差額：${money(Math.abs(diff),cur)}`);
+    sumBox.classList.toggle('bad', !isZero(diff,cur));
+  }
+
+  function setFormSelectValue(id,value){ const sel=$(id); if(sel && [...sel.options].some(o=>o.value===value)) sel.value=value; }
+  function setExpenseEditMode(id=null){
+    editingExpenseId = id;
+    const on=!!id;
+    $('saveExpenseBtn').textContent = on ? '更新這一筆' : '儲存這一筆';
+    $('cancelExpenseEditBtn').style.display = on ? 'block' : 'none';
+    $('expenseEditBanner').style.display = on ? 'block' : 'none';
+  }
+  function setPoolEditMode(id=null){
+    editingPoolId = id;
+    const on=!!id;
+    $('savePoolBtn').textContent = on ? '更新現金池紀錄' : '加入現金池';
+    $('cancelPoolEditBtn').style.display = on ? 'block' : 'none';
+  }
+  function setLinkEditMode(id=null){
+    editingLinkId = id;
+    const on=!!id;
+    $('saveLinkBtn').textContent = on ? '更新連結' : '儲存連結';
+    $('cancelLinkEditBtn').style.display = on ? 'block' : 'none';
+  }
+  function beginEditExpense(id){
+    const t=trip(); const ex=t.expenses.find(e=>e.id===id); if(!ex) return toast('找不到這筆支出');
+    switchTab('expense');
+    $('expenseDate').value=ex.date||todayISO(); $('expenseTitle').value=ex.title||''; $('expenseAmount').value=ex.amount||''; $('expenseReceiptUrl').value=ex.receiptUrl||''; $('expenseNote').value=ex.note||'';
+    fillCurrencySelect($('expenseCurrency')); setFormSelectValue('expenseCurrency',ex.currency||'TWD');
+    const cat=$('expenseCategory'); cat.innerHTML=''; categories.forEach(c=>cat.append(el('option',{value:c,text:c}))); setFormSelectValue('expenseCategory',ex.category||'其他');
+    payerMode=ex.payerType==='pool'?'pool':'person'; shareMode=ex.splitMode==='custom'?'custom':'equal';
+    renderExpenseForm();
+    setFormSelectValue('expensePayer',ex.payerId||'');
+    const ids=new Set(ex.splitMode==='custom' && ex.customShares ? Object.keys(ex.customShares) : (ex.sharerIds||[]));
+    document.querySelectorAll('#sharerList input').forEach(input=>{ input.checked=ids.has(input.value); input.parentElement.classList.toggle('active',input.checked); });
+    renderCustomShareInputs();
+    if(ex.splitMode==='custom' && ex.customShares){
+      document.querySelectorAll('#customShareList input[data-person-id]').forEach(input=>{ input.value=ex.customShares[input.dataset.personId] || ''; });
+      updateCustomShareSum();
+    }
+    setExpenseEditMode(id);
+    toast('已載入支出，可修改後按更新');
+  }
+  function beginEditPool(id){
+    const t=trip(); const rec=t.poolContributions.find(x=>x.id===id); if(!rec) return toast('找不到這筆現金池紀錄');
+    switchTab('pool');
+    $('poolDate').value=rec.date||todayISO(); $('poolAmount').value=rec.amount||''; $('poolNote').value=rec.note||'';
+    const psel=$('poolPerson'); psel.innerHTML=''; t.people.forEach(p=>psel.append(el('option',{value:p.id,text:p.name}))); setFormSelectValue('poolPerson',rec.personId||'');
+    fillCurrencySelect($('poolCurrency')); setFormSelectValue('poolCurrency',rec.currency||'TWD');
+    setPoolEditMode(id); toast('已載入現金池紀錄，可修改後按更新');
+  }
+  function beginEditLink(id){
+    const t=trip(); const rec=t.links.find(x=>x.id===id); if(!rec) return toast('找不到這個連結');
+    switchTab('search');
+    $('linkDate').value=rec.date||todayISO(); $('linkTitle').value=rec.title||''; $('linkUrl').value=rec.url||''; $('linkNote').value=rec.note||'';
+    const sel=$('linkType'); sel.innerHTML=''; linkTypes.forEach(x=>sel.append(el('option',{value:x,text:x}))); setFormSelectValue('linkType',rec.type||'其他');
+    setLinkEditMode(id); toast('已載入連結，可修改後按更新');
+  }
+  function cancelExpenseEdit(){ editingExpenseId=null; resetExpenseForm(); toast('已取消編輯支出'); }
+  function cancelPoolEdit(){ editingPoolId=null; resetPoolForm(); setPoolEditMode(null); toast('已取消編輯現金池'); }
+  function cancelLinkEdit(){ editingLinkId=null; resetLinkForm(); setLinkEditMode(null); toast('已取消編輯連結'); }
+  function expenseItem(ex, allowDelete){
+    const t=trip(); const sharers=ex.splitMode==='custom' && ex.customShares ? Object.entries(ex.customShares).filter(([,v])=>Number(v)>0).map(([id,v])=>`${personName(id,t)} ${money(v,ex.currency)}`).join('、') : (ex.sharerIds||[]).map(id=>personName(id,t)).join('、'); const payerText=ex.payerType==='pool'?'現金池':personName(ex.payerId,t);
+    const splitLabel = ex.splitMode==='custom' ? '自訂分攤' : '平均分攤';
+    const node=el('div',{class:'item'},[
+      el('div',{class:'item-top'},[
+        el('div',{},[el('div',{class:'item-title',text:ex.title||'未命名項目'}), el('div',{class:'item-meta',text:`${ex.date}｜${ex.category||'其他'}｜${payerText} 支付｜${splitLabel}：${sharers||'無'}`})]),
+        el('div',{class:'right'},[el('span',{class:`badge ${ex.payerType==='pool'?'pool':'person'}`,text:ex.payerType==='pool'?'現金池':'旅伴'}), el('div',{class:'money',text:money(ex.amount,ex.currency)})])
+      ])
+    ]);
+    if(ex.receiptUrl) node.append(el('a',{class:'link',href:ex.receiptUrl,target:'_blank',rel:'noopener',text:'開啟收據／票券連結'}));
+    if(ex.note) node.append(el('div',{class:'item-meta',text:`備註：${ex.note}`}));
+    if(allowDelete){ const edit=el('button',{class:'btn secondary small',text:'編輯'}); edit.addEventListener('click',()=>beginEditExpense(ex.id)); const del=el('button',{class:'btn danger small',text:'刪除這筆'}); del.addEventListener('click',()=>{ if(confirm(`確定刪除「${ex.title||'這筆費用'}」？`)){t.expenses=t.expenses.filter(e=>e.id!==ex.id); if(editingExpenseId===ex.id) setExpenseEditMode(null); saveState(); toast('已刪除支出');} }); node.append(el('div',{class:'row wrap'},[edit,del])); }
+    return node;
+  }
+  function renderExpenses(){
+    const box=$('expensesList'); box.innerHTML=''; const sorted=[...trip().expenses].sort(sortDesc);
+    if(!sorted.length){ box.append(el('div',{class:'empty',text:'費用會列在這裡。'})); return; }
+    sorted.forEach(ex=>box.append(expenseItem(ex,true)));
+  }
+  function renderSearch(){
+    const t=trip(); const sel=$('searchDate'); const cur=sel.value; const dates=[...new Set(t.expenses.map(e=>e.date).filter(Boolean))].sort().reverse(); sel.innerHTML=''; sel.append(el('option',{value:'',text:'全部日期'})); dates.forEach(d=>sel.append(el('option',{value:d,text:d}))); if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+    const keyword=($('searchKeyword').value||'').trim().toLowerCase(); const date=sel.value;
+    const result=t.expenses.filter(e=>{
+      if(date && e.date!==date) return false;
+      if(!keyword) return true;
+      const hay=[e.title,e.category,e.note,personName(e.payerId,t),e.payerType==='pool'?'現金池':'',...(e.sharerIds||[]).map(id=>personName(id,t))].join(' ').toLowerCase();
+      return hay.includes(keyword);
+    }).sort(sortDesc);
+    const box=$('searchResult'); box.innerHTML='';
+    if(!result.length){ box.append(el('div',{class:'empty',text:'沒有符合條件的支出。'})); return; }
+    result.forEach(e=>box.append(expenseItem(e,false)));
+  }
+  function buildLedgerForPerson(t, person, computed){
+    const totals = {};
+    Object.keys(currencies).forEach(cur => totals[cur] = {directPaid:0,poolIn:0,share:0,remainder:computed.poolRemainder[cur]?.byPerson?.[person.id] || 0});
+    const entries = [];
+    t.poolContributions.forEach(rec => {
+      if(rec.personId !== person.id) return;
+      const amount = Number(rec.amount)||0; const cur = rec.currency;
+      totals[cur].poolIn += amount;
+      entries.push({date:rec.date, createdAt:rec.createdAt, currency:cur, title:rec.note || '現金池出資', category:'現金池', role:'現金池出資', paid:amount, share:0, note:rec.note||''});
+    });
+    t.expenses.forEach(ex => {
+      const amount = Number(ex.amount)||0; const cur = ex.currency;
+      const sharers = (ex.sharerIds||[]).filter(id => t.people.some(p=>p.id===id));
+      const customShare = ex.splitMode === 'custom' && ex.customShares ? Number(ex.customShares[person.id])||0 : 0;
+      const isSharer = ex.splitMode === 'custom' ? customShare > 0 : sharers.includes(person.id);
+      const isPayer = ex.payerType !== 'pool' && ex.payerId === person.id;
+      if(!isSharer && !isPayer) return;
+      const share = ex.splitMode === 'custom' ? customShare : (isSharer && sharers.length ? amount / sharers.length : 0);
+      const paid = isPayer ? amount : 0;
+      totals[cur].directPaid += paid;
+      totals[cur].share += share;
+      let role = ex.splitMode === 'custom' ? '自訂分攤' : '分攤';
+      if(isPayer && isSharer) role = ex.splitMode === 'custom' ? '先付＋自訂分攤' : '先付＋分攤';
+      else if(isPayer) role = '先付';
+      else if(ex.payerType === 'pool') role = ex.splitMode === 'custom' ? '現金池自訂分攤' : '現金池分攤';
+      entries.push({date:ex.date, createdAt:ex.createdAt, currency:cur, title:ex.title||'未命名項目', category:ex.category||'其他', role, paid, share, note:ex.note||'', receiptUrl:ex.receiptUrl||''});
+    });
+    entries.sort(sortDesc);
+    return {totals, entries};
+  }
+  function renderLedger(){
+    const t=trip(); const personSel=$('ledgerPerson'); const curPerson=personSel.value; personSel.innerHTML='';
+    personSel.append(el('option',{value:'',text:'全部旅伴'}));
+    t.people.forEach(p=>personSel.append(el('option',{value:p.id,text:p.name})));
+    if([...personSel.options].some(o=>o.value===curPerson)) personSel.value=curPerson;
+    const currencySel=$('ledgerCurrency'); const curCurrency=currencySel.value; currencySel.innerHTML='';
+    currencySel.append(el('option',{value:'',text:'全部幣別'}));
+    Object.entries(currencies).forEach(([code,info])=>currencySel.append(el('option',{value:code,text:`${info.name} ${code}`})));
+    if([...currencySel.options].some(o=>o.value===curCurrency)) currencySel.value=curCurrency;
+    const selectedPerson=personSel.value; const selectedCurrency=currencySel.value;
+    const box=$('ledgerList'); box.innerHTML='';
+    if(!t.people.length){ box.append(el('div',{class:'empty',text:'尚未新增旅伴。'})); return; }
+    if(!t.expenses.length && !t.poolContributions.length){ box.append(el('div',{class:'empty',text:'目前行程還沒有支出或現金池紀錄。'})); return; }
+    const computed=compute(t); const people = selectedPerson ? t.people.filter(p=>p.id===selectedPerson) : t.people;
+    people.forEach(person=>{
+      const ledger = buildLedgerForPerson(t, person, computed);
+      const curEntries = selectedCurrency ? ledger.entries.filter(e=>e.currency===selectedCurrency) : ledger.entries;
+      const currencyCodes = selectedCurrency ? [selectedCurrency] : Object.keys(currencies);
+      const totalCards=[];
+      currencyCodes.forEach(cur=>{
+        const data=ledger.totals[cur];
+        if(!data) return;
+        const actualOut = data.directPaid + data.poolIn;
+        const has = !isZero(data.directPaid,cur) || !isZero(data.poolIn,cur) || !isZero(data.share,cur) || !isZero(data.remainder,cur);
+        if(!has) return;
+        totalCards.push(el('div',{class:'ledger-total'},[
+          el('div',{class:'label',text:currencies[cur].name}),
+          el('div',{class:'value',text:`實際拿出去 ${money(actualOut,cur)}`}),
+          el('div',{class:'item-meta',text:`自己先付 ${money(data.directPaid,cur)}｜現金池出資 ${money(data.poolIn,cur)}`}),
+          el('div',{class:'item-meta',text:`個人分攤消費 ${money(data.share,cur)}${!isZero(data.remainder,cur)?`｜現金池剩餘 ${money(data.remainder,cur)}`:''}`})
+        ]));
+      });
+      const children=[el('h3',{text:person.name}), el('div',{class:'ledger-totals'}, totalCards.length?totalCards:[el('div',{class:'empty',text:'這個篩選條件下沒有帳簿金額。'})])];
+      if(curEntries.length){
+        const table=el('table',{},[
+          el('thead',{},[el('tr',{},[el('th',{text:'日期'}),el('th',{text:'項目'}),el('th',{text:'角色'}),el('th',{text:'付出'}),el('th',{text:'個人分攤'})])]),
+          el('tbody',{},curEntries.map(entry=>el('tr',{},[
+            el('td',{text:entry.date||''}),
+            el('td',{},[el('div',{class:'item-title',text:entry.title}),el('div',{class:'item-meta',text:entry.category + (entry.note?`｜${entry.note}`:'')})]),
+            el('td',{},[el('span',{class:'role-tag',text:entry.role})]),
+            el('td',{text:!isZero(entry.paid,entry.currency)?money(entry.paid,entry.currency):'—'}),
+            el('td',{text:!isZero(entry.share,entry.currency)?money(entry.share,entry.currency):'—'})
+          ])))
+        ]);
+        children.push(el('div',{class:'table-wrap'},[table]));
+      }else{
+        children.push(el('div',{class:'empty',text:'這個人目前沒有符合條件的支出明細。'}));
+      }
+      box.append(el('div',{class:'ledger-person'},children));
+    });
+  }
+
+  function renderLinks(){
+    const typeSel=$('linkType'); const cur=typeSel.value; typeSel.innerHTML=''; linkTypes.forEach(x=>typeSel.append(el('option',{value:x,text:x}))); if(cur) typeSel.value=cur;
+    const list=$('linkList'); list.innerHTML=''; const t=trip();
+    const expenseLinks=t.expenses.filter(e=>e.receiptUrl).map(e=>({id:'ex-'+e.id,date:e.date,type:'支出收據',title:e.title,url:e.receiptUrl,note:e.note,expense:true}));
+    const links=[...t.links.map(l=>({...l,expense:false})),...expenseLinks].sort(sortDesc);
+    if(!links.length){ list.append(el('div',{class:'empty',text:'尚未儲存雲端連結。'})); return; }
+    links.forEach(l=>{
+      const children=[el('div',{class:'item-top'},[el('div',{},[el('div',{class:'item-title',text:l.title}), el('div',{class:'item-meta',text:`${l.date}｜${l.type}${l.note?'｜'+l.note:''}`})]), el('a',{class:'btn secondary small',href:l.url,target:'_blank',rel:'noopener',text:'開啟'})])];
+      if(!l.expense){ const edit=el('button',{class:'btn secondary small',text:'編輯'}); edit.addEventListener('click',()=>beginEditLink(l.id)); const del=el('button',{class:'btn danger small',text:'刪除'}); del.addEventListener('click',()=>{ if(confirm('確定刪除這個連結？')){t.links=t.links.filter(x=>x.id!==l.id); if(editingLinkId===l.id) setLinkEditMode(null); saveState(); toast('已刪除連結');} }); children.push(el('div',{class:'row wrap'},[edit,del])); }
+      list.append(el('div',{class:'item'},children));
+    });
+  }
+  function renderSettlement(){
+    const t=trip(); const computed=compute(t); const settleBox=$('settlementList'); const balBox=$('balancesList'); const remBox=$('poolRemainderList'); settleBox.innerHTML=''; balBox.innerHTML=''; remBox.innerHTML='';
+    if(!t.expenses.length && !t.poolContributions.length){ settleBox.append(el('div',{class:'empty',text:'有支出後，這裡會自動產生結算。'})); balBox.append(el('div',{class:'empty',text:'尚無收支。'})); remBox.append(el('div',{class:'empty',text:'現金池尚無剩餘。'})); return; }
+    let hasSettlement=false;
+    Object.entries(currencies).forEach(([cur,info])=>{
+      const items=computed.settlements[cur]||[]; const shortage=computed.poolShortage[cur]||0;
+      if(!items.length && isZero(shortage,cur)) return;
+      hasSettlement=true; const block=el('div',{class:'currency-block'},[el('div',{class:'currency-title',text:info.name + '結算'})]);
+      if(items.length){ items.forEach(s=>block.append(el('div',{class:'settle'},[el('strong',{text:personName(s.from,t)}),document.createTextNode(' 轉給 '),el('strong',{text:personName(s.to,t)}),document.createTextNode(' '),el('strong',{text:money(s.amount,cur)})]))); }
+      if(!isZero(shortage,cur)) block.append(el('div',{class:'warn',text:`現金池不足 ${money(shortage,cur)}，請先補登現金池出資，否則這個幣別結算不完整。`}));
+      settleBox.append(block);
+    });
+    if(!hasSettlement) settleBox.append(el('div',{class:'empty',text:'目前各幣別都已打平，不需要轉帳。'}));
+    t.people.forEach(p=>{
+      const parts=[]; Object.keys(currencies).forEach(cur=>{ const b=computed.balances[p.id]?.[cur]; if(!b) return; const bal=roundCurrency(b.balance,cur); if(!isZero(b.paid,cur)||!isZero(b.owed,cur)||!isZero(bal,cur)) parts.push(`${currencies[cur].name}：先付 ${money(b.paid,cur)}｜分攤 ${money(b.owed,cur)}｜${bal>=0?'應收':'應付'} ${money(Math.abs(bal),cur)}`); });
+      balBox.append(el('div',{class:'balance'},[el('div',{},[el('div',{class:'name',text:p.name}), el('div',{class:'desc',text:parts.join('；') || '尚無紀錄'})])]));
+    });
+    let hasRem=false;
+    Object.entries(currencies).forEach(([cur,info])=>{
+      const rem=computed.poolRemainder[cur]; if(!rem || isZero(rem.total,cur)) return; hasRem=true;
+      const text=Object.entries(rem.byPerson).filter(([,v])=>!isZero(v,cur)).map(([id,v])=>`${personName(id,t)}：${money(v,cur)}`).join('｜');
+      remBox.append(el('div',{class:'item'},[el('div',{class:'item-title',text:`${info.name}剩餘 ${money(rem.total,cur)}`}), el('div',{class:'item-meta',text:text || '無'}), el('div',{class:'hint',text:'這是現金池未花完的歸屬，請自行決定留作下次、退回，或由誰保管。'})]));
+    });
+    if(!hasRem) remBox.append(el('div',{class:'empty',text:'現金池沒有剩餘歸屬。'}));
+  }
+  function resetExpenseForm(){ $('expenseDate').value=todayISO(); $('expenseTitle').value=''; $('expenseAmount').value=''; $('expenseCurrency').value='TWD'; $('expenseCategory').value='餐食'; $('expenseReceiptUrl').value=''; $('expenseNote').value=''; payerMode='person'; shareMode='equal'; setExpenseEditMode(null); renderExpenseForm(); }
+  function resetPoolForm(){ $('poolDate').value=todayISO(); $('poolAmount').value=''; $('poolCurrency').value='TWD'; $('poolNote').value=''; setPoolEditMode(null); }
+  function resetLinkForm(){ $('linkDate').value=todayISO(); $('linkTitle').value=''; $('linkUrl').value=''; $('linkNote').value=''; $('linkType').value='收據'; setLinkEditMode(null); }
+  function showDownloadNotice(filename){
+    const message = `已送出下載：${filename}<br>Android 通常可在「檔案／Files → Download／下載」找到；也可到「Chrome → ⋮ → 下載內容」查看。<br><span class="hint">瀏覽器基於隱私限制，不會把完整實際路徑交給 PWA，所以這裡顯示常見存檔位置。</span>`;
+    const box = $('downloadNotice');
+    if(box){ box.innerHTML = message; box.style.display = 'block'; }
+    toast(`JSON 已送出下載，請到 Download／下載查看`);
+  }
+  function exportJSON(data, filename){
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showDownloadNotice(filename);
+  }
+  function settlementText(){
+    const t=trip(); const c=compute(t); const lines=[`【${t.name}｜米兔分帳結算】`,''];
+    let any=false;
+    Object.entries(currencies).forEach(([cur,info])=>{
+      const list=c.settlements[cur]||[]; const shortage=c.poolShortage[cur]||0;
+      if(!list.length && isZero(shortage,cur)) return; any=true; lines.push(`【${info.name}】`);
+      list.forEach(s=>lines.push(`${personName(s.from,t)} → ${personName(s.to,t)}：${money(s.amount,cur)}`));
+      if(!isZero(shortage,cur)) lines.push(`⚠ 現金池不足：${money(shortage,cur)}，請補登出資。`);
+      lines.push('');
+    });
+    if(!any) lines.push('目前各幣別都已打平，不需要轉帳。','');
+    lines.push('【每人收支】');
+    t.people.forEach(p=>{ const parts=[]; Object.keys(currencies).forEach(cur=>{ const b=c.balances[p.id]?.[cur]; if(b && (!isZero(b.paid,cur)||!isZero(b.owed,cur)||!isZero(b.balance,cur))) parts.push(`${currencies[cur].name} 先付${money(b.paid,cur)}／分攤${money(b.owed,cur)}／${b.balance>=0?'應收':'應付'}${money(Math.abs(b.balance),cur)}`); }); lines.push(`${p.name}：${parts.join('；') || '無紀錄'}`); });
+    return lines.join('\n');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+  document.querySelectorAll('[data-jump]').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.jump)));
+  function switchTab(tab){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${tab}`)); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  $('currentTripSelect').addEventListener('change',e=>{state.currentTripId=e.target.value; saveState(); toast('已切換行程');});
+  $('addTripBtn').addEventListener('click',()=>{ const name=$('newTripName').value.trim(); if(!name) return toast('請輸入行程名稱'); const t=makeTrip(name); state.trips.push(t); state.currentTripId=t.id; $('newTripName').value=''; saveState(); toast('已新增行程'); });
+  $('newTripName').addEventListener('keydown',e=>{if(e.key==='Enter') $('addTripBtn').click();});
+  $('renameTripBtn').addEventListener('click',()=>{ const name=$('tripNameEdit').value.trim(); if(!name) return toast('行程名稱不可空白'); trip().name=name; saveState(); toast('已更新行程名稱'); });
+  $('addPersonBtn').addEventListener('click',()=>{ const name=$('personName').value.trim(); const t=trip(); if(!name) return toast('請先輸入旅伴姓名'); if(t.people.some(p=>p.name===name)) return toast('這個名字已經存在'); t.people.push({id:newId(),name}); $('personName').value=''; saveState(); toast('已新增旅伴'); });
+  $('personName').addEventListener('keydown',e=>{if(e.key==='Enter') $('addPersonBtn').click();});
+  $('savePoolBtn').addEventListener('click',()=>{ const t=trip(); const amount=Number($('poolAmount').value); const personId=$('poolPerson').value; if(!personId) return toast('請先新增旅伴'); if(!amount||amount<=0) return toast('請輸入正確金額'); const data={date:$('poolDate').value||todayISO(),personId,amount,currency:$('poolCurrency').value,note:$('poolNote').value.trim()}; if(editingPoolId){ const rec=t.poolContributions.find(x=>x.id===editingPoolId); if(!rec) return toast('找不到要更新的現金池紀錄'); Object.assign(rec,data); saveState(); resetPoolForm(); toast('已更新現金池紀錄'); } else { t.poolContributions.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetPoolForm(); toast('已加入現金池'); } });
+  $('payerPersonMode').addEventListener('click',()=>{payerMode='person'; renderExpenseForm();}); $('payerPoolMode').addEventListener('click',()=>{payerMode='pool'; renderExpenseForm();});
+  $('equalSplitMode').addEventListener('click',()=>{shareMode='equal'; renderExpenseForm();}); $('customSplitMode').addEventListener('click',()=>{shareMode='custom'; renderExpenseForm();});
+  $('expenseAmount').addEventListener('input',updateCustomShareSum); $('expenseCurrency').addEventListener('change',()=>{ renderExpenseForm(); updateCustomShareSum(); });
+  $('selectAllSharers').addEventListener('click',()=>{document.querySelectorAll('#sharerList input').forEach(i=>{i.checked=true;i.parentElement.classList.add('active');}); renderCustomShareInputs();});
+  $('clearSharers').addEventListener('click',()=>{document.querySelectorAll('#sharerList input').forEach(i=>{i.checked=false;i.parentElement.classList.remove('active');}); renderCustomShareInputs();});
+  $('saveExpenseBtn').addEventListener('click',()=>{
+    const t=trip(); if(!t.people.length) return toast('請先新增旅伴');
+    const amount=Number($('expenseAmount').value); const currency=$('expenseCurrency').value; const title=$('expenseTitle').value.trim();
+    let sharerIds=[...document.querySelectorAll('#sharerList input:checked')].map(i=>i.value); const receiptUrl=$('expenseReceiptUrl').value.trim();
+    if(!title) return toast('請輸入項目名稱'); if(!amount||amount<=0) return toast('請輸入正確金額'); if(!sharerIds.length) return toast('至少要選一位分攤者'); if(!validUrl(receiptUrl)) return toast('連結請用 http 或 https 開頭');
+    let customShares={}; let splitMode='equal';
+    if(shareMode==='custom'){
+      const custom=getCustomSharesFromForm(); customShares=custom.shares; sharerIds=Object.keys(customShares); splitMode='custom';
+      if(!sharerIds.length) return toast('請輸入至少一位旅伴的自訂分攤金額');
+      const sum=roundCurrency(custom.sum,currency); const total=roundCurrency(amount,currency);
+      if(!isZero(sum-total,currency)) return toast(`自訂分攤合計需等於總金額，目前合計 ${money(sum,currency)}，總金額 ${money(total,currency)}`);
+    }
+    const data={date:$('expenseDate').value||todayISO(),title,amount,currency,category:$('expenseCategory').value,payerType:payerMode,payerId:payerMode==='person' ? $('expensePayer').value : '',sharerIds,splitMode,customShares,note:$('expenseNote').value.trim(),receiptUrl};
+    if(editingExpenseId){
+      const ex=t.expenses.find(e=>e.id===editingExpenseId); if(!ex) return toast('找不到要更新的支出');
+      Object.assign(ex,data); saveState(); resetExpenseForm(); toast('已更新支出');
+    }else{
+      t.expenses.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetExpenseForm(); toast('已儲存支出');
+    }
+  });
+  $('resetExpenseFormBtn').addEventListener('click',resetExpenseForm); $('cancelExpenseEditBtn').addEventListener('click',cancelExpenseEdit); $('cancelPoolEditBtn').addEventListener('click',cancelPoolEdit); $('cancelLinkEditBtn').addEventListener('click',cancelLinkEdit);
+  $('searchDate').addEventListener('change',renderSearch); $('searchKeyword').addEventListener('input',renderSearch);
+  $('ledgerPerson').addEventListener('change',renderLedger); $('ledgerCurrency').addEventListener('change',renderLedger);
+  $('saveLinkBtn').addEventListener('click',()=>{ const t=trip(); const title=$('linkTitle').value.trim(); const url=$('linkUrl').value.trim(); if(!title) return toast('請輸入連結名稱'); if(!url || !validUrl(url)) return toast('請輸入 http 或 https 開頭的連結'); const data={date:$('linkDate').value||todayISO(),type:$('linkType').value,title,url,note:$('linkNote').value.trim()}; if(editingLinkId){ const rec=t.links.find(x=>x.id===editingLinkId); if(!rec) return toast('找不到要更新的連結'); Object.assign(rec,data); saveState(); resetLinkForm(); toast('已更新連結'); } else { t.links.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetLinkForm(); toast('已儲存連結'); } });
+  $('copySettlementBtn').addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
+  $('exportAllBtn').addEventListener('click',()=>exportJSON(state,`米兔分帳全部行程_${todayISO()}.json`));
+  $('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},`米兔分帳_${trip().name}_${todayISO()}.json`));
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.0',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
+  $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
+
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(console.warn));
+  resetExpenseForm(); resetPoolForm(); resetLinkForm(); render();
 })();
 </script>
 </body>
