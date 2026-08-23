@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-2-9-custom-split';
+const CACHE_NAME = 'mitu-travel-split-v1-3-1-export-location-notice';
 const ASSETS = [
   './',
   './index.html',
@@ -11,111 +11,95 @@ const ASSETS = [
 
 function upgradeIndex(html) {
   let out = html
-    .replaceAll('米兔分帳小幫手 V1.2.6', '米兔分帳小幫手 V1.2.9')
-    .replaceAll('米兔分帳小幫手 V1.2.7', '米兔分帳小幫手 V1.2.9')
-    .replaceAll('米兔分帳小幫手 V1.2.8', '米兔分帳小幫手 V1.2.9')
-    .replaceAll('V1.2.6', 'V1.2.9')
-    .replaceAll('V1.2.7', 'V1.2.9')
-    .replaceAll('V1.2.8', 'V1.2.9');
+    .replaceAll('米兔分帳小幫手 V1.2.6', '米兔分帳小幫手 V1.3.1')
+    .replaceAll('米兔分帳小幫手 V1.2.7', '米兔分帳小幫手 V1.3.1')
+    .replaceAll('米兔分帳小幫手 V1.2.8', '米兔分帳小幫手 V1.3.1')
+    .replaceAll('米兔分帳小幫手 V1.2.9', '米兔分帳小幫手 V1.3.1')
+    .replaceAll('V1.2.6', 'V1.3.1')
+    .replaceAll('V1.2.7', 'V1.3.1')
+    .replaceAll('V1.2.8', 'V1.3.1')
+    .replaceAll('V1.2.9', 'V1.3.1');
 
-  const injector = `<script id="mitu-v129-custom-split">
+  const injector = `<script id="mitu-v131-export-location-notice">
 (function(){
-  var customMode = false;
-  function id(){ return (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2); }
-  function money(n){ return String(Number(n||0).toLocaleString('zh-TW')); }
-  function currentCurrency(){ var el=document.getElementById('expenseCurrency'); return el ? el.value : 'TWD'; }
-  function checkedPeople(){ return Array.from(document.querySelectorAll('#sharerList input:checked')).map(function(i){ return {id:i.value, name:(i.parentElement ? i.parentElement.textContent.trim() : i.value)}; }); }
-  function parseState(){
-    var raw=localStorage.getItem('mituTravelSplit.v1_1');
-    if(raw){ try{return JSON.parse(raw);}catch(e){} }
-    var tripSel=document.getElementById('currentTripSelect');
-    var tripId=tripSel && tripSel.value ? tripSel.value : id();
-    var people=Array.from(document.querySelectorAll('#expensePayer option')).map(function(o){return {id:o.value,name:o.textContent};});
-    if(!people.length) people=checkedPeople();
-    return {app:'米兔分帳小幫手',version:'1.2.9',currentTripId:tripId,trips:[{id:tripId,name:tripSel && tripSel.selectedOptions[0] ? tripSel.selectedOptions[0].textContent : '未命名行程',people:people,expenses:[],poolContributions:[],links:[]}]};
+  function showExportNotice(filename){
+    var msg = '已送出下載：' + (filename || 'JSON 備份檔') + '\n\nAndroid 通常可在「檔案／Files → Download／下載」找到；也可到「Chrome → ⋮ → 下載內容」查看。\n\n提醒：瀏覽器基於隱私限制，不會把完整實際路徑交給 PWA。';
+    var box = document.getElementById('jsonExportNoticeBox');
+    if(!box){
+      box = document.createElement('div');
+      box.id = 'jsonExportNoticeBox';
+      box.className = 'note';
+      box.style.cssText = 'white-space:pre-line;margin-top:12px;border-left:5px solid #4f89a3;background:#e8f6fb;color:#35401d;font-weight:800';
+      var dataPage = document.getElementById('page-data');
+      var target = document.querySelector('#exportAllBtn, #exportTripBtn, [id*="export"]');
+      var parent = target ? target.closest('.card') : null;
+      if(parent) parent.appendChild(box);
+      else if(dataPage) dataPage.insertBefore(box, dataPage.firstChild);
+      else document.body.appendChild(box);
+    }
+    box.textContent = msg;
+    if(window.toast) { try{ window.toast('JSON 已送出下載，請看下載資料夾'); }catch(e){} }
+    else alert(msg);
   }
-  function activeTrip(state){
-    var trip=state.trips.find(function(t){return t.id===state.currentTripId;});
-    if(!trip){ trip=state.trips[0]; state.currentTripId=trip.id; }
-    return trip;
+
+  function patchDownloadClick(){
+    if(HTMLAnchorElement.prototype._mituJsonNoticePatched) return;
+    var oldClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function(){
+      var name = this.getAttribute('download') || '';
+      var href = this.getAttribute('href') || '';
+      var isJson = /\.json$/i.test(name) || (name && name.indexOf('分帳') >= 0) || href.indexOf('blob:') === 0;
+      var result = oldClick.apply(this, arguments);
+      if(isJson){ setTimeout(function(){ showExportNotice(name || '米兔分帳備份.json'); }, 120); }
+      return result;
+    };
+    HTMLAnchorElement.prototype._mituJsonNoticePatched = true;
   }
-  function updateSum(){
-    var sumEl=document.getElementById('customShareSum'); if(!sumEl) return;
-    var amount=Number((document.getElementById('expenseAmount')||{}).value)||0;
-    var sum=0; document.querySelectorAll('#customShareList input[data-person-id]').forEach(function(i){ sum += Number(i.value)||0; });
-    var diff=Math.round((sum-amount)*100)/100;
-    sumEl.textContent='自訂分攤合計：' + money(sum) + '｜總金額：' + money(amount) + (Math.abs(diff)<0.005 ? '' : '｜差額：' + money(Math.abs(diff)));
-    sumEl.style.color = Math.abs(diff)<0.005 ? '#4f89a3' : '#b4534c';
-    sumEl.style.fontWeight='950';
+
+  function addExportHint(){
+    var dataPage = document.getElementById('page-data');
+    if(!dataPage || document.getElementById('jsonExportHint')) return;
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'jsonExportHint';
+    card.innerHTML = '<h2>JSON 匯出位置</h2><div class="note">匯出 JSON 後，檔案通常會進入 Android 的「檔案／Files → Download／下載」。Chrome 也可從右上角 ⋮ → 下載內容查看。因瀏覽器隱私限制，PWA 只能提示常見位置，不能讀取完整實際路徑。</div>';
+    var first = dataPage.querySelector('.card');
+    if(first && first.nextSibling) dataPage.insertBefore(card, first.nextSibling);
+    else dataPage.appendChild(card);
   }
-  function renderCustomInputs(){
-    var box=document.getElementById('customShareList'); if(!box) return;
-    var old={}; box.querySelectorAll('input[data-person-id]').forEach(function(i){old[i.dataset.personId]=i.value;});
-    box.innerHTML='';
-    if(!customMode){ updateSum(); return; }
-    checkedPeople().forEach(function(p){
-      var row=document.createElement('div'); row.style.cssText='display:grid;grid-template-columns:1fr minmax(110px,160px);gap:8px;align-items:center;border:1px solid #d9e5bb;border-radius:14px;background:#fff;padding:8px 10px;margin-bottom:8px';
-      var name=document.createElement('div'); name.textContent=p.name; name.style.cssText='font-weight:950;color:#5f742b';
-      var input=document.createElement('input'); input.type='number'; input.min='0'; input.step='0.01'; input.inputMode='decimal'; input.placeholder='0'; input.dataset.personId=p.id; input.value=old[p.id]||''; input.addEventListener('input',updateSum);
-      row.appendChild(name); row.appendChild(input); box.appendChild(row);
-    });
-    updateSum();
-  }
-  function addUI(){
-    if(document.getElementById('customSplitMode')) return;
-    var sharer=document.getElementById('sharerList'); if(!sharer) return;
-    var h=document.createElement('h3'); h.textContent='分攤方式';
-    var seg=document.createElement('div'); seg.className='seg no-print';
-    var equal=document.createElement('button'); equal.id='equalSplitMode'; equal.type='button'; equal.className='btn active'; equal.textContent='平均分攤';
-    var custom=document.createElement('button'); custom.id='customSplitMode'; custom.type='button'; custom.className='btn'; custom.textContent='自訂分攤金額';
-    seg.appendChild(equal); seg.appendChild(custom);
-    var box=document.createElement('div'); box.id='customSplitBox'; box.style.cssText='display:none;margin-top:10px';
-    box.innerHTML='<div class="note">適合點餐各吃各的：例如總額 190，甲 100、乙 90。系統會自動拆成個人明細，合計必須等於總金額。</div><div id="customShareList"></div><div id="customShareSum" style="margin-top:6px"></div>';
-    sharer.after(h,seg,box);
-    equal.addEventListener('click',function(){customMode=false;equal.classList.add('active');custom.classList.remove('active');box.style.display='none';renderCustomInputs();});
-    custom.addEventListener('click',function(){customMode=true;custom.classList.add('active');equal.classList.remove('active');box.style.display='block';renderCustomInputs();});
-    document.getElementById('expenseAmount')?.addEventListener('input',updateSum);
-    document.getElementById('expenseCurrency')?.addEventListener('change',updateSum);
-    document.getElementById('sharerList')?.addEventListener('change',renderCustomInputs);
-  }
-  function saveCustom(e){
-    if(!customMode) return;
-    e.preventDefault(); e.stopImmediatePropagation();
-    var amount=Number((document.getElementById('expenseAmount')||{}).value)||0;
-    var title=(document.getElementById('expenseTitle')||{}).value?.trim()||'';
-    if(!title){ alert('請輸入項目名稱'); return; }
-    if(!amount||amount<=0){ alert('請輸入正確金額'); return; }
-    var shares=[]; var sum=0;
-    document.querySelectorAll('#customShareList input[data-person-id]').forEach(function(i){ var v=Number(i.value)||0; if(v>0){ var name=(i.parentElement && i.parentElement.firstChild ? i.parentElement.firstChild.textContent : i.dataset.personId); shares.push({id:i.dataset.personId,name:name,amount:v}); sum+=v; } });
-    if(!shares.length){ alert('請輸入至少一位旅伴的自訂分攤金額'); return; }
-    if(Math.abs(sum-amount)>0.005){ alert('自訂分攤合計需等於總金額，目前合計 '+money(sum)+'，總金額 '+money(amount)); return; }
-    var state=parseState(); var t=activeTrip(state);
-    var currency=currentCurrency(); var now=new Date().toISOString();
-    var payerPerson=document.getElementById('expensePayer'); var payerType=document.getElementById('payerPoolMode')?.classList.contains('active') ? 'pool' : 'person';
-    var base={createdAt:now,date:document.getElementById('expenseDate')?.value||now.slice(0,10),currency:currency,category:document.getElementById('expenseCategory')?.value||'其他',payerType:payerType,payerId:payerType==='person' && payerPerson ? payerPerson.value : '',receiptUrl:document.getElementById('expenseReceiptUrl')?.value.trim()||''};
-    var note0=document.getElementById('expenseNote')?.value.trim()||'';
-    shares.forEach(function(s){
-      t.expenses.push(Object.assign({},base,{id:id(),title:title+'－'+s.name,amount:s.amount,sharerIds:[s.id],note:(note0 ? note0+'｜' : '')+'自訂分攤：原總額 '+money(amount)+' '+currency}));
-    });
-    localStorage.setItem('mituTravelSplit.v1_1',JSON.stringify(state));
-    alert('已儲存自訂分攤，並自動拆成 '+shares.length+' 筆個人明細。');
-    location.reload();
-  }
+
   function addUpdateLog(){
-    var page=document.getElementById('page-data'); if(!page || document.getElementById('v129UpdateLog')) return;
-    var card=document.createElement('div'); card.className='card'; card.id='v129UpdateLog';
-    card.innerHTML='<h2>更新記錄</h2><div class="list"><div class="item"><div class="item-title">V1.2.9｜自訂分攤金額</div><div class="item-meta">新增支出可選自訂分攤金額，適合點餐各吃各的；系統會自動拆成個人明細。</div></div></div>';
-    page.insertBefore(card,page.children[1]||null);
+    var page = document.getElementById('page-data');
+    if(!page) return;
+    var existing = document.getElementById('updateLogCard') || document.getElementById('v129UpdateLog');
+    if(existing){
+      if(existing.textContent.indexOf('V1.3.1') < 0){
+        var item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = '<div class="item-title">V1.3.1｜JSON 匯出位置提示</div><div class="item-meta">匯出 JSON 後顯示檔名與 Android 常見下載位置提示。</div>';
+        var list = existing.querySelector('.list') || existing;
+        list.insertBefore(item, list.firstChild);
+      }
+      return;
+    }
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'updateLogCard';
+    card.innerHTML = '<h2>更新記錄</h2><div class="list">'
+      + '<div class="item"><div class="item-title">V1.3.1｜JSON 匯出位置提示</div><div class="item-meta">匯出 JSON 後顯示檔名與 Android 常見下載位置提示。</div></div>'
+      + '<div class="item"><div class="item-title">V1.3.0｜既有紀錄可編輯</div><div class="item-meta">支出、現金池與雲端連結可編輯既有紀錄。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.9｜自訂分攤金額</div><div class="item-meta">新增自訂分攤金額，適合點餐各吃各的。</div></div>'
+      + '<div class="item"><div class="item-title">V1.2.8｜首頁帳簿捷徑與更新記錄</div><div class="item-meta">帳簿捷徑移到首頁上方，新增更新記錄。</div></div>'
+      + '</div>';
+    page.appendChild(card);
   }
-  function run(){
-    addUI(); addUpdateLog();
-    var save=document.getElementById('saveExpenseBtn'); if(save && !save.dataset.customSplitBound){ save.dataset.customSplitBound='1'; save.addEventListener('click',saveCustom,true); }
-    setTimeout(addUI,300);
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+
+  function run(){ patchDownloadClick(); addExportHint(); addUpdateLog(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
 })();
 </script>`;
-  if(!out.includes('mitu-v129-custom-split')) out = out.replace('</body>', injector + '</body>');
+  if(!out.includes('mitu-v131-export-location-notice')) out = out.replace('</body>', injector + '</body>');
   return out;
 }
 
