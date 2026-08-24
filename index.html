@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.2</title>
+  <title>米兔分帳小幫手 V1.4.3</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，最後分幣別結算。</p>
           </div>
         </div>
-        <div class="version">V1.4.2</div>
+        <div class="version">V1.4.3</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -255,7 +255,25 @@
       <section class="page" id="page-settlement">
         <div class="card">
           <h2>最後誰付誰</h2>
-          <div class="note">不換算匯率。台幣、日圓、韓幣、美金會分開結算。</div>
+          <div class="note">預設保留原幣別分開結算；若想看單一幣別總結，可改用「統一幣別結算」，並自行輸入本次行程採用匯率。</div>
+          <div class="grid two no-print" style="margin-top:10px">
+            <div>
+              <label>結算方式</label>
+              <div class="seg">
+                <button class="btn active" id="settlementSeparateMode" type="button">原幣別分開</button>
+                <button class="btn" id="settlementUnifiedMode" type="button">統一幣別</button>
+              </div>
+            </div>
+            <div>
+              <label for="settlementTargetCurrency">統一成哪一種幣別</label>
+              <select id="settlementTargetCurrency"></select>
+            </div>
+          </div>
+          <div id="unifiedSettlementBox" class="note no-print" style="display:none;margin-top:10px">
+            <strong>自行設定匯率：</strong>請輸入「1 原幣別 = 多少統一幣別」。例如統一成台幣時，可填 1 JPY = 0.22 TWD。本工具不查即時匯率，也不改動原始支出紀錄。
+            <div id="settlementRateList" class="grid two" style="margin-top:10px"></div>
+            <div id="settlementRateHint" class="hint"></div>
+          </div>
           <div id="settlementList" class="list"></div>
           <div class="grid two no-print" style="margin-top:12px"><button class="btn secondary full" id="copySettlementBtn">複製結算文字</button><button class="btn secondary full" onclick="window.print()">列印／存成 PDF</button></div>
         </div>
@@ -312,6 +330,7 @@
         <div class="card">
           <h2>更新記錄</h2>
           <div class="list">
+            <div class="item"><div class="item-title">V1.4.3｜統一幣別結算</div><div class="item-meta">結算頁新增「原幣別分開／統一幣別」選項；使用者可自選統一幣別並自行輸入匯率，結算摘要與 HTML／列印輸出會依設定顯示。</div></div>
             <div class="item"><div class="item-title">V1.4.2｜類別統計</div><div class="item-meta">新增「類別統計」，依類別彙總各幣別花費總和；HTML／列印輸出可選擇是否包含類別統計。</div></div>
             <div class="item"><div class="item-title">V1.4.1｜HTML／列印輸出強化</div><div class="item-meta">新增單一行程 HTML 輸出、列印單一行程、排序依據與列印範圍選項；列印版改用深色大字，避免 PDF 字太小太淡，也能減少頁數。</div></div>
             <div class="item"><div class="item-title">V1.4.0｜完整原生部署版</div><div class="item-meta">把既有紀錄編輯、自訂分攤金額、帳簿捷徑、JSON 匯出位置提示與更新記錄全部整合在 index.html 主程式內，不再依賴 service worker 熱修補丁。</div></div>
@@ -355,8 +374,8 @@
   const categories = ['餐食','交通','門票','住宿','購物','票券','其他'];
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
-  const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[]});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.2',currentTripId:trip.id,trips:[trip]}; };
+  const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.3',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
   let shareMode = 'equal';
@@ -378,6 +397,24 @@
     children.forEach(child => node.append(child));
     return node;
   };
+
+  function defaultSettlementRates(target='TWD'){
+    const rates = {};
+    Object.keys(currencies).forEach(cur => rates[cur] = cur === target ? 1 : '');
+    return rates;
+  }
+  function normalizeSettlementRates(rates={}, target='TWD'){
+    const out = defaultSettlementRates(target);
+    if(rates && typeof rates === 'object'){
+      Object.keys(currencies).forEach(cur => {
+        if(cur === target){ out[cur] = 1; return; }
+        const v = Number(rates[cur]);
+        out[cur] = v > 0 ? v : '';
+      });
+    }
+    out[target] = 1;
+    return out;
+  }
 
   function normalizeCustomShares(customShares, sharerIds=[]){
     const result = {};
@@ -404,7 +441,10 @@
       })) : [],
       links:Array.isArray(t.links) ? t.links.map(l=>({
         id:l.id||newId(), createdAt:l.createdAt||new Date().toISOString(), date:l.date||todayISO(), type:linkTypes.includes(l.type)?l.type:'其他', title:l.title||'未命名連結', url:l.url||'', note:l.note||''
-      })) : []
+      })) : [],
+      settlementMode:t.settlementMode === 'unified' ? 'unified' : 'separate',
+      settlementTarget:currencies[t.settlementTarget] ? t.settlementTarget : 'TWD',
+      settlementRates:normalizeSettlementRates(t.settlementRates, currencies[t.settlementTarget] ? t.settlementTarget : 'TWD')
     };
   }
   function loadState(){
@@ -413,14 +453,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.2',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.3',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.2',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.3',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -530,10 +570,116 @@
     }
     return result;
   }
+  function settlementSettings(t=trip()){
+    if(!t.settlementMode) t.settlementMode = 'separate';
+    if(!currencies[t.settlementTarget]) t.settlementTarget = 'TWD';
+    t.settlementRates = normalizeSettlementRates(t.settlementRates, t.settlementTarget);
+    return {mode:t.settlementMode,target:t.settlementTarget,rates:t.settlementRates};
+  }
+  function settleUnifiedMap(totals, target){
+    const debtors = []; const creditors = [];
+    Object.entries(totals).forEach(([id,value]) => {
+      const bal = roundCurrency(value,target);
+      if(isZero(bal,target)) return;
+      if(bal < 0) debtors.push({id,amount:-bal}); else creditors.push({id,amount:bal});
+    });
+    debtors.sort((a,b)=>b.amount-a.amount); creditors.sort((a,b)=>b.amount-a.amount);
+    const items=[]; let i=0,j=0;
+    while(i<debtors.length && j<creditors.length){
+      let amount = roundCurrency(Math.min(debtors[i].amount,creditors[j].amount),target);
+      if(!isZero(amount,target)) items.push({from:debtors[i].id,to:creditors[j].id,amount,currency:target});
+      debtors[i].amount = roundCurrency(debtors[i].amount - amount,target);
+      creditors[j].amount = roundCurrency(creditors[j].amount - amount,target);
+      if(isZero(debtors[i].amount,target)) i++;
+      if(isZero(creditors[j].amount,target)) j++;
+    }
+    return {items,unmatchedDebtors:debtors.slice(i),unmatchedCreditors:creditors.slice(j)};
+  }
+  function computeUnifiedSettlement(t=trip(), computed=compute(t)){
+    const settings = settlementSettings(t); const target = settings.target;
+    const totals = {}; const missing = new Set(); const usedRates = [];
+    t.people.forEach(p => totals[p.id] = 0);
+    Object.keys(currencies).forEach(cur => {
+      let hasBalance = false;
+      t.people.forEach(p => { const bal = computed.balances[p.id]?.[cur]?.balance || 0; if(!isZero(bal,cur)) hasBalance = true; });
+      if(!hasBalance) return;
+      const rate = cur === target ? 1 : Number(settings.rates[cur]);
+      if(cur !== target && (!rate || rate <= 0)){ missing.add(cur); return; }
+      usedRates.push({from:cur,to:target,rate});
+      t.people.forEach(p => {
+        const bal = computed.balances[p.id]?.[cur]?.balance || 0;
+        if(!isZero(bal,cur)) totals[p.id] = roundCurrency((totals[p.id] || 0) + bal * rate, target);
+      });
+    });
+    const settled = settleUnifiedMap(totals,target);
+    return {target,rates:settings.rates,missing:[...missing],usedRates,totals,settlements:settled.items,unmatchedDebtors:settled.unmatchedDebtors,unmatchedCreditors:settled.unmatchedCreditors};
+  }
+  function rateLabel(rate, target){
+    if(!rate || rate <= 0) return '未設定';
+    return Number(rate).toLocaleString('zh-TW',{maximumFractionDigits:6}) + ' ' + target;
+  }
+  function renderSettlementOptions(){
+    const t = trip(); const settings = settlementSettings(t);
+    const targetSel = $('settlementTargetCurrency');
+    if(!targetSel) return;
+    const target = settings.target;
+    $('settlementSeparateMode')?.classList.toggle('active', settings.mode !== 'unified');
+    $('settlementUnifiedMode')?.classList.toggle('active', settings.mode === 'unified');
+    targetSel.innerHTML = '';
+    Object.entries(currencies).forEach(([code,info]) => targetSel.append(el('option',{value:code,text:`${info.name} ${code}`})));
+    targetSel.value = target;
+    const box = $('unifiedSettlementBox');
+    if(box) box.style.display = settings.mode === 'unified' ? 'block' : 'none';
+    const list = $('settlementRateList');
+    if(!list) return;
+    list.innerHTML = '';
+    Object.entries(currencies).forEach(([code,info]) => {
+      const disabled = code === target;
+      const input = el('input',{type:'number',step:'0.000001',min:'0',inputmode:'decimal',value:disabled?1:(settings.rates[code]||''),placeholder:disabled?'1':'自行輸入'});
+      if(disabled) input.setAttribute('disabled','disabled');
+      input.addEventListener('change',()=>{
+        const curTrip = trip(); const s = settlementSettings(curTrip);
+        const v = Number(input.value);
+        s.rates[code] = code === s.target ? 1 : (v > 0 ? v : '');
+        curTrip.settlementRates = s.rates;
+        saveState();
+        toast('已更新匯率設定');
+      });
+      list.append(el('div',{},[
+        el('label',{text:`1 ${info.name} ${code} = 多少 ${currencies[target].name} ${target}`}),
+        input
+      ]));
+    });
+    const hint = $('settlementRateHint');
+    if(hint) hint.textContent = `目前統一幣別：${currencies[target].name} ${target}。原始支出仍保留原幣別，只有結算摘要會換算。`;
+  }
+  function renderUnifiedSettlement(t, computed, settleBox){
+    const unified = computeUnifiedSettlement(t, computed); const target = unified.target;
+    const block = el('div',{class:'currency-block'},[el('div',{class:'currency-title',text:`統一結算：${currencies[target].name}`})]);
+    if(unified.missing.length){
+      const text = unified.missing.map(cur=>`1 ${currencies[cur].name} ${cur} = ? ${target}`).join('；');
+      block.append(el('div',{class:'warn',text:`尚缺匯率：${text}。缺匯率的幣別不會納入統一結算。`}));
+    }
+    if(unified.usedRates.length){
+      const text = unified.usedRates.map(r => r.from === target ? `1 ${target} = 1 ${target}` : `1 ${r.from} = ${rateLabel(r.rate,target)}`).join('｜');
+      block.append(el('div',{class:'item-meta',text:`採用匯率：${text}`}));
+    }
+    if(unified.settlements.length){
+      unified.settlements.forEach(s=>block.append(el('div',{class:'settle'},[el('strong',{text:personName(s.from,t)}),document.createTextNode(' 轉給 '),el('strong',{text:personName(s.to,t)}),document.createTextNode(' '),el('strong',{text:money(s.amount,target)})])));
+    }else{
+      block.append(el('div',{class:'empty',text:unified.missing.length ? '可換算的幣別目前已打平；請補齊匯率後再確認完整統一結算。' : '統一幣別後目前已打平，不需要轉帳。'}));
+    }
+    Object.entries(computed.poolShortage).forEach(([cur,shortage])=>{ if(!isZero(shortage,cur)) block.append(el('div',{class:'warn',text:`原幣別現金池不足：${money(shortage,cur)}，請先補登現金池出資，否則結算不完整。`})); });
+    if(unified.unmatchedDebtors.length || unified.unmatchedCreditors.length){
+      block.append(el('div',{class:'warn',text:'有部分金額因現金池不足或四捨五入無法完全配平，請先確認原幣別資料。'}));
+    }
+    settleBox.append(block);
+  }
+
   function sortByDate(a,b){ return (a.date||'').localeCompare(b.date||'') || (a.createdAt||'').localeCompare(b.createdAt||''); }
   function sortDesc(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''); }
 
-  function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlement(); renderCategoryStats(); }
+  function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlementOptions(); renderSettlement(); renderCategoryStats(); }
   function renderTripSelect(){
     const sel=$('currentTripSelect'); const current=state.currentTripId; sel.innerHTML='';
     state.trips.forEach(t => sel.append(el('option',{value:t.id,text:t.name})));
@@ -846,20 +992,26 @@
     });
   }
   function renderSettlement(){
-    const t=trip(); const computed=compute(t); const settleBox=$('settlementList'); const balBox=$('balancesList'); const remBox=$('poolRemainderList'); settleBox.innerHTML=''; balBox.innerHTML=''; remBox.innerHTML='';
+    const t=trip(); const settings=settlementSettings(t); const computed=compute(t); const settleBox=$('settlementList'); const balBox=$('balancesList'); const remBox=$('poolRemainderList'); settleBox.innerHTML=''; balBox.innerHTML=''; remBox.innerHTML='';
     if(!t.expenses.length && !t.poolContributions.length){ settleBox.append(el('div',{class:'empty',text:'有支出後，這裡會自動產生結算。'})); balBox.append(el('div',{class:'empty',text:'尚無收支。'})); remBox.append(el('div',{class:'empty',text:'現金池尚無剩餘。'})); return; }
-    let hasSettlement=false;
-    Object.entries(currencies).forEach(([cur,info])=>{
-      const items=computed.settlements[cur]||[]; const shortage=computed.poolShortage[cur]||0;
-      if(!items.length && isZero(shortage,cur)) return;
-      hasSettlement=true; const block=el('div',{class:'currency-block'},[el('div',{class:'currency-title',text:info.name + '結算'})]);
-      if(items.length){ items.forEach(s=>block.append(el('div',{class:'settle'},[el('strong',{text:personName(s.from,t)}),document.createTextNode(' 轉給 '),el('strong',{text:personName(s.to,t)}),document.createTextNode(' '),el('strong',{text:money(s.amount,cur)})]))); }
-      if(!isZero(shortage,cur)) block.append(el('div',{class:'warn',text:`現金池不足 ${money(shortage,cur)}，請先補登現金池出資，否則這個幣別結算不完整。`}));
-      settleBox.append(block);
-    });
-    if(!hasSettlement) settleBox.append(el('div',{class:'empty',text:'目前各幣別都已打平，不需要轉帳。'}));
+    if(settings.mode === 'unified'){
+      renderUnifiedSettlement(t, computed, settleBox);
+    }else{
+      let hasSettlement=false;
+      Object.entries(currencies).forEach(([cur,info])=>{
+        const items=computed.settlements[cur]||[]; const shortage=computed.poolShortage[cur]||0;
+        if(!items.length && isZero(shortage,cur)) return;
+        hasSettlement=true; const block=el('div',{class:'currency-block'},[el('div',{class:'currency-title',text:info.name + '結算'})]);
+        if(items.length){ items.forEach(s=>block.append(el('div',{class:'settle'},[el('strong',{text:personName(s.from,t)}),document.createTextNode(' 轉給 '),el('strong',{text:personName(s.to,t)}),document.createTextNode(' '),el('strong',{text:money(s.amount,cur)})]))); }
+        if(!isZero(shortage,cur)) block.append(el('div',{class:'warn',text:`現金池不足 ${money(shortage,cur)}，請先補登現金池出資，否則這個幣別結算不完整。`}));
+        settleBox.append(block);
+      });
+      if(!hasSettlement) settleBox.append(el('div',{class:'empty',text:'目前各幣別都已打平，不需要轉帳。'}));
+    }
+    const unified = settings.mode === 'unified' ? computeUnifiedSettlement(t,computed) : null;
     t.people.forEach(p=>{
       const parts=[]; Object.keys(currencies).forEach(cur=>{ const b=computed.balances[p.id]?.[cur]; if(!b) return; const bal=roundCurrency(b.balance,cur); if(!isZero(b.paid,cur)||!isZero(b.owed,cur)||!isZero(bal,cur)) parts.push(`${currencies[cur].name}：先付 ${money(b.paid,cur)}｜分攤 ${money(b.owed,cur)}｜${bal>=0?'應收':'應付'} ${money(Math.abs(bal),cur)}`); });
+      if(unified && !unified.missing.length){ const ub=roundCurrency(unified.totals[p.id]||0, unified.target); if(!isZero(ub,unified.target)) parts.push(`統一後：${ub>=0?'應收':'應付'} ${money(Math.abs(ub),unified.target)}`); }
       balBox.append(el('div',{class:'balance'},[el('div',{},[el('div',{class:'name',text:p.name}), el('div',{class:'desc',text:parts.join('；') || '尚無紀錄'})])]));
     });
     let hasRem=false;
@@ -985,18 +1137,37 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.2｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.3｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
-      Object.entries(currencies).forEach(([cur,info])=>{
-        const list = computed.settlements[cur] || []; const shortage = computed.poolShortage[cur] || 0;
-        if(!list.length && isZero(shortage,cur)) return;
-        has = true; html += `<h3>${htmlEscape(info.name)}</h3>`;
-        list.forEach(s=> html += `<div class="settle"><strong>${htmlEscape(personName(s.from,t))}</strong> 轉給 <strong>${htmlEscape(personName(s.to,t))}</strong> <strong>${htmlEscape(money(s.amount,cur))}</strong></div>`);
-        if(!isZero(shortage,cur)) html += `<div class="warn">現金池不足：${htmlEscape(money(shortage,cur))}，請先補登現金池出資。</div>`;
-      });
-      if(!has) html = '<p>目前各幣別都已打平，不需要轉帳。</p>';
+      const settings = settlementSettings(t);
+      if(settings.mode === 'unified'){
+        const unified = computeUnifiedSettlement(t, computed); const target = unified.target;
+        html += `<h3>統一結算：${htmlEscape(currencies[target].name)} ${htmlEscape(target)}</h3>`;
+        if(unified.usedRates.length){
+          const rateText = unified.usedRates.map(r => r.from === target ? `1 ${target} = 1 ${target}` : `1 ${r.from} = ${rateLabel(r.rate,target)}`).join('｜');
+          html += `<p class="small">採用匯率：${htmlEscape(rateText)}</p>`;
+        }
+        if(unified.missing.length){
+          html += `<div class="warn">尚缺匯率：${htmlEscape(unified.missing.map(cur=>`1 ${cur} = ? ${target}`).join('；'))}。缺匯率的幣別未納入統一結算。</div>`;
+        }
+        if(unified.settlements.length){
+          has = true;
+          unified.settlements.forEach(s=> html += `<div class="settle"><strong>${htmlEscape(personName(s.from,t))}</strong> 轉給 <strong>${htmlEscape(personName(s.to,t))}</strong> <strong>${htmlEscape(money(s.amount,target))}</strong></div>`);
+        }
+        Object.entries(computed.poolShortage).forEach(([cur,shortage])=>{ if(!isZero(shortage,cur)) html += `<div class="warn">原幣別現金池不足：${htmlEscape(money(shortage,cur))}，請先補登現金池出資。</div>`; });
+        if(!has) html += '<p>統一幣別後目前已打平，不需要轉帳。</p>';
+      }else{
+        Object.entries(currencies).forEach(([cur,info])=>{
+          const list = computed.settlements[cur] || []; const shortage = computed.poolShortage[cur] || 0;
+          if(!list.length && isZero(shortage,cur)) return;
+          has = true; html += `<h3>${htmlEscape(info.name)}</h3>`;
+          list.forEach(s=> html += `<div class="settle"><strong>${htmlEscape(personName(s.from,t))}</strong> 轉給 <strong>${htmlEscape(personName(s.to,t))}</strong> <strong>${htmlEscape(money(s.amount,cur))}</strong></div>`);
+          if(!isZero(shortage,cur)) html += `<div class="warn">現金池不足：${htmlEscape(money(shortage,cur))}，請先補登現金池出資。</div>`;
+        });
+        if(!has) html = '<p>目前各幣別都已打平，不需要轉帳。</p>';
+      }
       body += section('結算摘要', html);
     }
     if(includeCategoryStats){
@@ -1049,19 +1220,31 @@
   }
 
   function settlementText(){
-    const t=trip(); const c=compute(t); const lines=[`【${t.name}｜米兔分帳結算】`,''];
+    const t=trip(); const c=compute(t); const settings=settlementSettings(t); const lines=[`【${t.name}｜米兔分帳結算】`,''];
     let any=false;
-    Object.entries(currencies).forEach(([cur,info])=>{
-      const list=c.settlements[cur]||[]; const shortage=c.poolShortage[cur]||0;
-      if(!list.length && isZero(shortage,cur)) return; any=true; lines.push(`【${info.name}】`);
-      list.forEach(s=>lines.push(`${personName(s.from,t)} → ${personName(s.to,t)}：${money(s.amount,cur)}`));
-      if(!isZero(shortage,cur)) lines.push(`⚠ 現金池不足：${money(shortage,cur)}，請補登出資。`);
+    if(settings.mode === 'unified'){
+      const unified = computeUnifiedSettlement(t,c); const target = unified.target;
+      lines.push(`【統一結算：${currencies[target].name} ${target}】`);
+      if(unified.usedRates.length){
+        lines.push('採用匯率：' + unified.usedRates.map(r => r.from === target ? `1 ${target} = 1 ${target}` : `1 ${r.from} = ${rateLabel(r.rate,target)}`).join('；'));
+      }
+      if(unified.missing.length) lines.push('⚠ 尚缺匯率：' + unified.missing.map(cur=>`1 ${cur} = ? ${target}`).join('；') + '。缺匯率的幣別未納入統一結算。');
+      unified.settlements.forEach(s=>{ any=true; lines.push(`${personName(s.from,t)} → ${personName(s.to,t)}：${money(s.amount,target)}`); });
+      Object.entries(c.poolShortage).forEach(([cur,shortage])=>{ if(!isZero(shortage,cur)) lines.push(`⚠ 原幣別現金池不足：${money(shortage,cur)}，請補登出資。`); });
       lines.push('');
-    });
-    if(!any) lines.push('目前各幣別都已打平，不需要轉帳。','');
+    }else{
+      Object.entries(currencies).forEach(([cur,info])=>{
+        const list=c.settlements[cur]||[]; const shortage=c.poolShortage[cur]||0;
+        if(!list.length && isZero(shortage,cur)) return; any=true; lines.push(`【${info.name}】`);
+        list.forEach(s=>lines.push(`${personName(s.from,t)} → ${personName(s.to,t)}：${money(s.amount,cur)}`));
+        if(!isZero(shortage,cur)) lines.push(`⚠ 現金池不足：${money(shortage,cur)}，請補登出資。`);
+        lines.push('');
+      });
+    }
+    if(!any) lines.push('目前已打平，不需要轉帳。','');
     lines.push('【每人收支】');
     t.people.forEach(p=>{ const parts=[]; Object.keys(currencies).forEach(cur=>{ const b=c.balances[p.id]?.[cur]; if(b && (!isZero(b.paid,cur)||!isZero(b.owed,cur)||!isZero(b.balance,cur))) parts.push(`${currencies[cur].name} 先付${money(b.paid,cur)}／分攤${money(b.owed,cur)}／${b.balance>=0?'應收':'應付'}${money(Math.abs(b.balance),cur)}`); }); lines.push(`${p.name}：${parts.join('；') || '無紀錄'}`); });
-    return lines.join('\n');
+    return lines.join('\\n');
   }
 
   document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
@@ -1104,6 +1287,9 @@
   $('searchDate').addEventListener('change',renderSearch); $('searchKeyword').addEventListener('input',renderSearch);
   $('ledgerPerson').addEventListener('change',renderLedger); $('ledgerCurrency').addEventListener('change',renderLedger);
   $('saveLinkBtn').addEventListener('click',()=>{ const t=trip(); const title=$('linkTitle').value.trim(); const url=$('linkUrl').value.trim(); if(!title) return toast('請輸入連結名稱'); if(!url || !validUrl(url)) return toast('請輸入 http 或 https 開頭的連結'); const data={date:$('linkDate').value||todayISO(),type:$('linkType').value,title,url,note:$('linkNote').value.trim()}; if(editingLinkId){ const rec=t.links.find(x=>x.id===editingLinkId); if(!rec) return toast('找不到要更新的連結'); Object.assign(rec,data); saveState(); resetLinkForm(); toast('已更新連結'); } else { t.links.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetLinkForm(); toast('已儲存連結'); } });
+  $('settlementSeparateMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='separate'; saveState(); toast('已改為原幣別分開結算'); });
+  $('settlementUnifiedMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='unified'; settlementSettings(t); saveState(); toast('已改為統一幣別結算'); });
+  $('settlementTargetCurrency')?.addEventListener('change',e=>{ const t=trip(); t.settlementTarget=e.target.value; t.settlementRates=defaultSettlementRates(t.settlementTarget); saveState(); toast('已更新統一幣別，請重新輸入匯率'); });
   $('copySettlementBtn').addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
   $('exportAllBtn').addEventListener('click',()=>exportJSON(state,`米兔分帳全部行程_${todayISO()}.json`));
   $('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},`米兔分帳_${trip().name}_${todayISO()}.json`));
@@ -1111,7 +1297,7 @@
   $('exportTripHtmlBtn')?.addEventListener('click',exportTripHTML);
   document.querySelectorAll('#reportScopeBox input').forEach(input=>input.addEventListener('change',updateReportScopePills));
   updateReportScopePills();
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.2',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.3',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 
