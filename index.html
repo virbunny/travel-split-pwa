@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.4</title>
+  <title>米兔分帳小幫手 V1.4.5</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.4</div>
+        <div class="version">V1.4.5</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -314,7 +314,7 @@
         <div class="card"><h2>每人收支摘要</h2><div id="reportBalancesPreview" class="summary-grid"></div></div>
         <div class="card">
           <h2>類別統計</h2>
-          <div class="note">依目前行程統計各類別花費總和；不同幣別不換算，分幣別列出。</div>
+          <div class="note">依目前行程統計各類別花費總和；若結算方式選「統一幣別」，類別統計也會同步換算成同一幣別，避免混淆。</div>
           <div id="categoryStatsList" class="list"></div>
         </div>
         <div class="card">
@@ -363,6 +363,7 @@
         <div class="card">
           <h2>更新記錄</h2>
           <div class="list">
+            <div class="item"><div class="item-title">V1.4.5｜統一幣別類別統計</div><div class="item-meta">若結算方式選「統一幣別」，類別統計同步換算成使用者指定幣別，不再分幣別列出，避免與統一結算結果混淆。</div></div>
             <div class="item"><div class="item-title">V1.4.4｜結算列印中心</div><div class="item-meta">新增「結算列印」獨立功能頁，集中顯示結算摘要、每人收支、類別統計與列印／HTML 輸出設定，避免結算與分類散在不同分頁。</div></div>
             <div class="item"><div class="item-title">V1.4.3｜統一幣別結算</div><div class="item-meta">結算頁新增「原幣別分開／統一幣別」選項；使用者可自選統一幣別並自行輸入匯率，結算摘要與 HTML／列印輸出會依設定顯示。</div></div>
             <div class="item"><div class="item-title">V1.4.2｜類別統計</div><div class="item-meta">新增「類別統計」，依類別彙總各幣別花費總和；HTML／列印輸出可選擇是否包含類別統計。</div></div>
@@ -409,7 +410,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.4',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.5',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
   let shareMode = 'equal';
@@ -487,14 +488,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.4',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.5',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.4',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.5',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -1150,16 +1151,79 @@
     });
     return Object.values(map).sort((a,b)=>a.category.localeCompare(b.category,'zh-Hant'));
   }
+  function categoryStatsUnified(t=trip()){
+    const settings = settlementSettings(t);
+    const target = settings.target;
+    const map = {};
+    const missing = new Set();
+    const usedRates = [];
+    Object.keys(currencies).forEach(cur=>{
+      if(cur === target) usedRates.push({from:cur,to:target,rate:1});
+      else if(Number(settings.rates[cur]) > 0) usedRates.push({from:cur,to:target,rate:Number(settings.rates[cur])});
+    });
+    (t.expenses||[]).forEach(ex=>{
+      const category = ex.category || '其他';
+      const currency = currencies[ex.currency] ? ex.currency : 'TWD';
+      const amount = Number(ex.amount) || 0;
+      if(!map[category]) map[category] = {category, count:0, convertedCount:0, total:0, missing:{}};
+      map[category].count += 1;
+      const rate = currency === target ? 1 : Number(settings.rates[currency]);
+      if(currency !== target && (!rate || rate <= 0)){
+        missing.add(currency);
+        map[category].missing[currency] = (map[category].missing[currency] || 0) + 1;
+        return;
+      }
+      map[category].convertedCount += 1;
+      map[category].total = roundCurrency((map[category].total || 0) + amount * rate, target);
+    });
+    const rows = Object.values(map).sort((a,b)=>a.category.localeCompare(b.category,'zh-Hant'));
+    return {mode:'unified', target, rows, missing:[...missing], usedRates};
+  }
+  function categoryStatsDisplay(t=trip()){
+    const settings = settlementSettings(t);
+    if(settings.mode === 'unified') return categoryStatsUnified(t);
+    return {mode:'separate', rows:categoryStats(t), missing:[], target:null, usedRates:[]};
+  }
   function renderCategoryStats(){
     const box = $('categoryStatsList');
     if(!box) return;
-    const rows = categoryStats(trip());
+    const t = trip();
+    const data = categoryStatsDisplay(t);
     box.innerHTML = '';
-    if(!rows.length){
+    const note = box.parentElement?.querySelector('.note');
+    if(note){
+      note.textContent = data.mode === 'unified'
+        ? `目前結算方式為「統一幣別」，類別統計已同步換算成 ${currencies[data.target].name} ${data.target}，不再分幣別列出。`
+        : '依目前行程統計各類別花費總和；目前使用原幣別分開統計，不做匯率換算。';
+    }
+    if(!data.rows.length){
       box.append(el('div',{class:'empty',text:'尚無支出，無法統計類別。'}));
       return;
     }
-    rows.forEach(row=>{
+    if(data.mode === 'unified'){
+      if(data.usedRates.length){
+        const text = data.usedRates.map(r => r.from === data.target ? `1 ${data.target} = 1 ${data.target}` : `1 ${r.from} = ${rateLabel(r.rate,data.target)}`).join('｜');
+        box.append(el('div',{class:'item'},[el('div',{class:'item-meta',text:`採用匯率：${text}`})]));
+      }
+      if(data.missing.length){
+        const text = data.missing.map(cur=>`1 ${currencies[cur].name} ${cur} = ? ${data.target}`).join('；');
+        box.append(el('div',{class:'warn',text:`尚缺匯率：${text}。缺匯率的支出未納入統一類別統計。`}));
+      }
+      data.rows.forEach(row=>{
+        const missingText = Object.entries(row.missing||{}).map(([cur,count])=>`${currencies[cur].name} ${count} 筆未換算`).join('｜');
+        box.append(el('div',{class:'item'},[
+          el('div',{class:'item-top'},[
+            el('div',{},[
+              el('div',{class:'item-title',text:row.category}),
+              el('div',{class:'item-meta',text:`${row.convertedCount}/${row.count} 筆已納入統一統計${missingText ? '｜' + missingText : ''}`})
+            ]),
+            el('div',{class:'right money',text:money(row.total,data.target)})
+          ])
+        ]));
+      });
+      return;
+    }
+    data.rows.forEach(row=>{
       const lines = Object.entries(currencies)
         .filter(([cur])=>!isZero(row.totals[cur]||0,cur))
         .map(([cur,info])=>`${info.name}：${money(row.totals[cur],cur)}`);
@@ -1175,12 +1239,18 @@
     });
   }
   function categoryStatsReportRows(t){
+    const data = categoryStatsDisplay(t);
+    if(data.mode === 'unified'){
+      return data.rows
+        .filter(row=>!isZero(row.total,data.target) || row.count > 0)
+        .map(row=>({category:row.category,currency:data.target,currencyName:currencies[data.target].name,count:row.count,convertedCount:row.convertedCount,total:row.total,missing:row.missing||{},mode:'unified'}));
+    }
     const rows = [];
-    categoryStats(t).forEach(row=>{
+    data.rows.forEach(row=>{
       Object.entries(currencies).forEach(([cur,info])=>{
         const total = row.totals[cur] || 0;
         if(isZero(total,cur)) return;
-        rows.push({category:row.category,currency:cur,currencyName:info.name,count:row.count,total});
+        rows.push({category:row.category,currency:cur,currencyName:info.name,count:row.count,convertedCount:row.count,total,missing:{},mode:'separate'});
       });
     });
     return rows;
@@ -1239,7 +1309,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.4｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.5｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1273,8 +1343,26 @@
       body += section('結算摘要', html);
     }
     if(includeCategoryStats){
-      const rows = categoryStatsReportRows(t).map(row=>`<tr><td>${htmlEscape(row.category)}</td><td>${htmlEscape(row.currencyName)}</td><td class="amount">${row.count}</td><td class="amount">${htmlEscape(money(row.total,row.currency))}</td></tr>`).join('');
-      body += section('類別統計', rows ? `<table><thead><tr><th>類別</th><th>幣別</th><th>筆數</th><th>花費總和</th></tr></thead><tbody>${rows}</tbody></table>` : '<p>尚無支出，無法統計類別。</p>');
+      const catData = categoryStatsDisplay(t);
+      let categoryHtml = '';
+      if(catData.mode === 'unified'){
+        if(catData.usedRates && catData.usedRates.length){
+          const rateText = catData.usedRates.map(r => r.from === catData.target ? `1 ${catData.target} = 1 ${catData.target}` : `1 ${r.from} = ${rateLabel(r.rate,catData.target)}`).join('｜');
+          categoryHtml += `<p class="small">統一幣別統計：${htmlEscape(currencies[catData.target].name)} ${htmlEscape(catData.target)}｜採用匯率：${htmlEscape(rateText)}</p>`;
+        }
+        if(catData.missing && catData.missing.length){
+          categoryHtml += `<div class="warn">尚缺匯率：${htmlEscape(catData.missing.map(cur=>`1 ${cur} = ? ${catData.target}`).join('；'))}。缺匯率的支出未納入統一類別統計。</div>`;
+        }
+        const rows = categoryStatsReportRows(t).map(row=>{
+          const missingText = Object.entries(row.missing||{}).map(([cur,count])=>`${cur} ${count} 筆未換算`).join('；');
+          return `<tr><td>${htmlEscape(row.category)}</td><td class="amount">${htmlEscape(row.convertedCount + '/' + row.count)}</td><td>${htmlEscape(missingText)}</td><td class="amount">${htmlEscape(money(row.total,row.currency))}</td></tr>`;
+        }).join('');
+        categoryHtml += rows ? `<table><thead><tr><th>類別</th><th>已納入／總筆數</th><th>未納入</th><th>花費總和</th></tr></thead><tbody>${rows}</tbody></table>` : '<p>尚無支出，無法統計類別。</p>';
+      }else{
+        const rows = categoryStatsReportRows(t).map(row=>`<tr><td>${htmlEscape(row.category)}</td><td>${htmlEscape(row.currencyName)}</td><td class="amount">${row.count}</td><td class="amount">${htmlEscape(money(row.total,row.currency))}</td></tr>`).join('');
+        categoryHtml = rows ? `<table><thead><tr><th>類別</th><th>幣別</th><th>筆數</th><th>花費總和</th></tr></thead><tbody>${rows}</tbody></table>` : '<p>尚無支出，無法統計類別。</p>';
+      }
+      body += section('類別統計', categoryHtml);
     }
     if(includeExpenses){
       const rows = sortedReportExpenses(t).map(ex=>`<tr><td>${htmlEscape(ex.date||'')}</td><td>${htmlEscape(ex.category||'')}</td><td><strong>${htmlEscape(ex.title||'')}</strong>${ex.splitMode==='custom'?'<br><span class="pill">自訂分攤</span>':''}${includeNotes && ex.note?`<br><span class="small">備註：${htmlEscape(ex.note)}</span>`:''}${includeNotes && ex.receiptUrl?`<br><span class="small">收據：${htmlEscape(ex.receiptUrl)}</span>`:''}</td><td>${htmlEscape(ex.payerType==='pool'?'現金池':personName(ex.payerId,t))}</td><td>${htmlEscape(splitSummary(ex,t))}</td><td class="amount">${htmlEscape(money(ex.amount,ex.currency))}</td></tr>`).join('');
@@ -1403,7 +1491,7 @@
   $('exportTripHtmlBtn')?.addEventListener('click',exportTripHTML);
   document.querySelectorAll('#reportScopeBox input').forEach(input=>input.addEventListener('change',updateReportScopePills));
   updateReportScopePills();
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.4',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.5',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 
