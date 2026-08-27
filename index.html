@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.6</title>
+  <title>米兔分帳小幫手 V1.4.7</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.6</div>
+        <div class="version">V1.4.7</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -363,6 +363,7 @@
         <div class="card">
           <h2>更新記錄</h2>
           <div class="list">
+            <div class="item"><div class="item-title">V1.4.7｜帳簿頁單項編輯</div><div class="item-meta">帳簿頁明細表新增「操作」欄，可直接從個人帳簿編輯相關支出或現金池出資紀錄，不必再回到費用列表尋找。</div></div>
             <div class="item"><div class="item-title">V1.4.6｜統一幣別支出明細</div><div class="item-meta">若結算方式選「統一幣別」，列印／HTML 輸出的支出明細金額也同步換算成統一幣別；原金額以小字括註，避免與結算摘要和類別統計混淆。</div></div>
             <div class="item"><div class="item-title">V1.4.5｜統一幣別類別統計</div><div class="item-meta">若結算方式選「統一幣別」，類別統計同步換算成使用者指定幣別，不再分幣別列出，避免與統一結算結果混淆。</div></div>
             <div class="item"><div class="item-title">V1.4.4｜結算列印中心</div><div class="item-meta">新增「結算列印」獨立功能頁，集中顯示結算摘要、每人收支、類別統計與列印／HTML 輸出設定，避免結算與分類散在不同分頁。</div></div>
@@ -411,7 +412,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.6',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.7',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
   let shareMode = 'equal';
@@ -489,14 +490,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.6',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.7',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.6',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.7',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -941,7 +942,7 @@
       if(rec.personId !== person.id) return;
       const amount = Number(rec.amount)||0; const cur = rec.currency;
       totals[cur].poolIn += amount;
-      entries.push({date:rec.date, createdAt:rec.createdAt, currency:cur, title:rec.note || '現金池出資', category:'現金池', role:'現金池出資', paid:amount, share:0, note:rec.note||''});
+      entries.push({sourceType:'pool', sourceId:rec.id, date:rec.date, createdAt:rec.createdAt, currency:cur, title:rec.note || '現金池出資', category:'現金池', role:'現金池出資', paid:amount, share:0, note:rec.note||''});
     });
     t.expenses.forEach(ex => {
       const amount = Number(ex.amount)||0; const cur = ex.currency;
@@ -958,11 +959,26 @@
       if(isPayer && isSharer) role = ex.splitMode === 'custom' ? '先付＋自訂分攤' : '先付＋分攤';
       else if(isPayer) role = '先付';
       else if(ex.payerType === 'pool') role = ex.splitMode === 'custom' ? '現金池自訂分攤' : '現金池分攤';
-      entries.push({date:ex.date, createdAt:ex.createdAt, currency:cur, title:ex.title||'未命名項目', category:ex.category||'其他', role, paid, share, note:ex.note||'', receiptUrl:ex.receiptUrl||''});
+      entries.push({sourceType:'expense', sourceId:ex.id, date:ex.date, createdAt:ex.createdAt, currency:cur, title:ex.title||'未命名項目', category:ex.category||'其他', role, paid, share, note:ex.note||'', receiptUrl:ex.receiptUrl||''});
     });
     entries.sort(sortDesc);
     return {totals, entries};
   }
+  function ledgerEntryAction(entry){
+    if(!entry || !entry.sourceId) return el('span',{class:'hint',text:'—'});
+    if(entry.sourceType === 'expense'){
+      const btn=el('button',{class:'btn secondary small',text:'編輯支出'});
+      btn.addEventListener('click',()=>beginEditExpense(entry.sourceId));
+      return btn;
+    }
+    if(entry.sourceType === 'pool'){
+      const btn=el('button',{class:'btn secondary small',text:'編輯現金池'});
+      btn.addEventListener('click',()=>beginEditPool(entry.sourceId));
+      return btn;
+    }
+    return el('span',{class:'hint',text:'—'});
+  }
+
   function renderLedger(){
     const t=trip(); const personSel=$('ledgerPerson'); const curPerson=personSel.value; personSel.innerHTML='';
     personSel.append(el('option',{value:'',text:'全部旅伴'}));
@@ -998,13 +1014,14 @@
       const children=[el('h3',{text:person.name}), el('div',{class:'ledger-totals'}, totalCards.length?totalCards:[el('div',{class:'empty',text:'這個篩選條件下沒有帳簿金額。'})])];
       if(curEntries.length){
         const table=el('table',{},[
-          el('thead',{},[el('tr',{},[el('th',{text:'日期'}),el('th',{text:'項目'}),el('th',{text:'角色'}),el('th',{text:'付出'}),el('th',{text:'個人分攤'})])]),
+          el('thead',{},[el('tr',{},[el('th',{text:'日期'}),el('th',{text:'項目'}),el('th',{text:'角色'}),el('th',{text:'付出'}),el('th',{text:'個人分攤'}),el('th',{text:'操作'})])]),
           el('tbody',{},curEntries.map(entry=>el('tr',{},[
             el('td',{text:entry.date||''}),
             el('td',{},[el('div',{class:'item-title',text:entry.title}),el('div',{class:'item-meta',text:entry.category + (entry.note?`｜${entry.note}`:'')})]),
             el('td',{},[el('span',{class:'role-tag',text:entry.role})]),
             el('td',{text:!isZero(entry.paid,entry.currency)?money(entry.paid,entry.currency):'—'}),
-            el('td',{text:!isZero(entry.share,entry.currency)?money(entry.share,entry.currency):'—'})
+            el('td',{text:!isZero(entry.share,entry.currency)?money(entry.share,entry.currency):'—'}),
+            el('td',{},[ledgerEntryAction(entry)])
           ])))
         ]);
         children.push(el('div',{class:'table-wrap'},[table]));
@@ -1346,7 +1363,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.6｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.7｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1530,7 +1547,7 @@
   $('exportTripHtmlBtn')?.addEventListener('click',exportTripHTML);
   document.querySelectorAll('#reportScopeBox input').forEach(input=>input.addEventListener('change',updateReportScopePills));
   updateReportScopePills();
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.6',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.7',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 

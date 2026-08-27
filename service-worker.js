@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-4-6-unified-expense-details';
+const CACHE_NAME = 'mitu-travel-split-v1-4-7-ledger-inline-edit';
 const ASSETS = [
   './',
   './index.html',
