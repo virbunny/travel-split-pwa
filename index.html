@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.7</title>
+  <title>米兔分帳小幫手 V1.4.8</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.7</div>
+        <div class="version">V1.4.8</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -361,8 +361,10 @@
           <div id="downloadNotice" class="note" style="display:none;margin-top:10px"></div>
         </div>
         <div class="card">
-          <h2>更新記錄</h2>
-          <div class="list">
+          <details id="updateLogDetails">
+            <summary style="cursor:pointer;font-weight:950;color:var(--brand2);font-size:1.02rem">更新記錄 <span class="hint">（點開查看版本變更）</span></summary>
+            <div class="list" style="margin-top:10px">
+              <div class="item"><div class="item-title">V1.4.8｜更新記錄折疊與同名匯入處理</div><div class="item-meta">更新記錄改為預設折疊，資料頁更清爽。匯入單一行程 JSON 時若偵測到同名或同 ID 行程，會讓使用者選擇覆蓋原行程、另存副本或取消匯入；匯入全部行程備份前會先確認，避免誤覆蓋。</div></div>
             <div class="item"><div class="item-title">V1.4.7｜帳簿頁單項編輯</div><div class="item-meta">帳簿頁明細表新增「操作」欄，可直接從個人帳簿編輯相關支出或現金池出資紀錄，不必再回到費用列表尋找。</div></div>
             <div class="item"><div class="item-title">V1.4.6｜統一幣別支出明細</div><div class="item-meta">若結算方式選「統一幣別」，列印／HTML 輸出的支出明細金額也同步換算成統一幣別；原金額以小字括註，避免與結算摘要和類別統計混淆。</div></div>
             <div class="item"><div class="item-title">V1.4.5｜統一幣別類別統計</div><div class="item-meta">若結算方式選「統一幣別」，類別統計同步換算成使用者指定幣別，不再分幣別列出，避免與統一結算結果混淆。</div></div>
@@ -379,7 +381,8 @@
             <div class="item"><div class="item-title">V1.2.6｜個人帳簿總覽</div><div class="item-meta">新增「帳簿」分頁，可依旅伴與幣別查看個人支出、分攤與明細。</div></div>
             <div class="item"><div class="item-title">V1.2.5｜行程名稱可編輯</div><div class="item-meta">行程列表可直接修改行程標題，不需刪除重建。</div></div>
             <div class="item"><div class="item-title">V1.2.4｜綠藍配色</div><div class="item-meta">移除粉紅點綴，改成淺綠主色＋粉藍輔色。</div></div>
-          </div>
+            </div>
+          </details>
         </div>
         <div class="card">
           <h2>安裝與離線</h2>
@@ -412,7 +415,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.7',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.8',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
   let shareMode = 'equal';
@@ -490,14 +493,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.7',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.8',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.7',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.8',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -1363,7 +1366,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.7｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.8｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1547,7 +1550,70 @@
   $('exportTripHtmlBtn')?.addEventListener('click',exportTripHTML);
   document.querySelectorAll('#reportScopeBox input').forEach(input=>input.addEventListener('change',updateReportScopePills));
   updateReportScopePills();
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.7',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  
+  function uniqueTripName(base){
+    const names = new Set(state.trips.map(t=>t.name));
+    if(!names.has(base)) return base;
+    let i = 2;
+    while(names.has(`${base}（匯入副本${i}）`)) i++;
+    return `${base}（匯入副本${i}）`;
+  }
+  function reassignTripIds(t){
+    t.id = newId();
+    return t;
+  }
+  function importSingleTrip(imported){
+    const conflictIndex = state.trips.findIndex(t => t.id === imported.id || t.name === imported.name);
+    if(conflictIndex < 0){
+      state.trips.push(imported);
+      state.currentTripId = imported.id;
+      return `已匯入行程：${imported.name}`;
+    }
+    const old = state.trips[conflictIndex];
+    const answer = prompt(`已存在同名或同 ID 行程：「${old.name}」。\n\n請輸入：\n1 = 覆蓋原行程\n2 = 另存副本\n\n按取消 = 不匯入`, '1');
+    if(answer === null) return '已取消匯入';
+    if(answer.trim() === '1'){
+      imported.id = old.id;
+      state.trips[conflictIndex] = imported;
+      state.currentTripId = old.id;
+      return `已覆蓋行程：${old.name}`;
+    }
+    if(answer.trim() === '2'){
+      imported = reassignTripIds(imported);
+      imported.name = uniqueTripName(imported.name);
+      state.trips.push(imported);
+      state.currentTripId = imported.id;
+      return `已另存副本：${imported.name}`;
+    }
+    throw new Error('cancelled-choice');
+  }
+  $('importFile').addEventListener('change',async e=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    try{
+      const data=JSON.parse(await file.text());
+      let message='已匯入 JSON';
+      if(Array.isArray(data.trips)){
+        const ok = confirm('這是「全部行程」JSON。匯入後會覆蓋目前所有行程與資料。\n\n確定要繼續嗎？');
+        if(!ok){ toast('已取消匯入'); return; }
+        state={app:'米兔分帳小幫手',version:'1.4.8',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)};
+        if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id;
+        message='已匯入全部行程，並覆蓋原資料';
+      } else if(data.trip){
+        const imported=normalizeTrip(data.trip);
+        message=importSingleTrip(imported);
+      } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){
+        const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses});
+        message=importSingleTrip(imported);
+      } else {
+        throw new Error('format');
+      }
+      if(!state.trips.length) throw new Error('empty');
+      saveState(); toast(message);
+    }catch(err){
+      if(err && err.message === 'cancelled-choice') toast('匯入選項無效，已取消');
+      else toast('匯入失敗，檔案格式不正確');
+    } finally{ e.target.value=''; }
+  });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 

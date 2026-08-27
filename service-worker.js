@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-4-7-ledger-inline-edit';
+const CACHE_NAME = 'mitu-travel-split-v1-4-8-import-conflict-log';
 const ASSETS = [
   './',
   './index.html',
