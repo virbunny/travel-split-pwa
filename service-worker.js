@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-4-5-unified-category-stats';
+const CACHE_NAME = 'mitu-travel-split-v1-4-6-unified-expense-details';
 const ASSETS = [
   './',
   './index.html',
