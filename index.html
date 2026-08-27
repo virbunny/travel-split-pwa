@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.3</title>
+  <title>米兔分帳小幫手 V1.4.4</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -78,10 +78,10 @@
           <img class="app-logo" src="icons/icon-192.png" alt="米兔分帳圖示">
           <div>
             <h1>米兔分帳小幫手</h1>
-            <p class="subtitle">用行程分開管理，原幣別記帳，最後分幣別結算。</p>
+            <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.3</div>
+        <div class="version">V1.4.4</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -103,6 +103,7 @@
         <button class="tab-btn" data-tab="search"><span>🔎</span><span>查詢</span></button>
         <button class="tab-btn" data-tab="ledger"><span>📒</span><span>帳簿</span></button>
         <button class="tab-btn" data-tab="settlement"><span>💸</span><span>結算</span></button>
+        <button class="tab-btn" data-tab="report"><span>🖨️</span><span>結算列印</span></button>
         <button class="tab-btn" data-tab="data"><span>🗂️</span><span>資料</span></button>
       </div>
     </nav>
@@ -132,7 +133,7 @@
           <div class="grid three no-print" style="margin-top:10px">
             <button class="btn full" data-jump="expense">＋ 記一筆支出</button>
             <button class="btn secondary full" data-jump="ledger">📒 查看個人帳簿</button>
-            <button class="btn secondary full" data-jump="settlement">看結算</button>
+            <button class="btn secondary full" data-jump="report">🖨️ 結算列印</button>
           </div>
         </div>
         <div class="card">
@@ -281,24 +282,43 @@
         <div class="card"><h2>現金池剩餘歸屬</h2><div id="poolRemainderList" class="list"></div></div>
       </section>
 
-      <section class="page" id="page-data">
+      <section class="page" id="page-report">
         <div class="card">
-          <h2>JSON 備份</h2>
-          <div class="grid two">
-            <button class="btn secondary full" id="exportAllBtn">匯出全部行程 JSON</button>
-            <button class="btn secondary full" id="exportTripBtn">匯出目前行程 JSON</button>
+          <h2>結算列印中心</h2>
+          <div class="note">把最後結算、類別統計與列印輸出集中在同一頁。這裡適合出發後整理帳、和旅伴對帳、產生單一行程 HTML 或列印成 PDF。</div>
+          <div class="grid two no-print" style="margin-top:10px">
+            <div>
+              <label>結算方式</label>
+              <div class="seg">
+                <button class="btn active" id="reportSettlementSeparateMode" type="button">原幣別分開</button>
+                <button class="btn" id="reportSettlementUnifiedMode" type="button">統一幣別</button>
+              </div>
+            </div>
+            <div>
+              <label for="reportSettlementTargetCurrency">統一成哪一種幣別</label>
+              <select id="reportSettlementTargetCurrency"></select>
+            </div>
           </div>
-          <label class="btn secondary full" style="text-align:center;display:flex;align-items:center;justify-content:center;margin-top:10px">匯入 JSON 備份<input id="importFile" type="file" accept="application/json,.json" style="display:none"></label>
-          <p class="hint">換手機、換瀏覽器或清除瀏覽資料前，請先匯出備份。</p>
-          <div id="downloadNotice" class="note" style="display:none;margin-top:10px"></div>
+          <div id="reportUnifiedSettlementBox" class="note no-print" style="display:none;margin-top:10px">
+            <strong>自行設定匯率：</strong>請輸入「1 原幣別 = 多少統一幣別」。這組設定與「結算」分頁共用；原始支出仍保留原幣別。
+            <div id="reportSettlementRateList" class="grid two" style="margin-top:10px"></div>
+            <div id="reportSettlementRateHint" class="hint"></div>
+          </div>
+          <h3>結算摘要預覽</h3>
+          <div id="reportSettlementPreview" class="list"></div>
+          <div class="grid two no-print" style="margin-top:12px">
+            <button class="btn secondary full" id="copyReportSettlementBtn">複製結算文字</button>
+            <button class="btn secondary full" data-jump="settlement">前往完整結算頁</button>
+          </div>
         </div>
+        <div class="card"><h2>每人收支摘要</h2><div id="reportBalancesPreview" class="summary-grid"></div></div>
         <div class="card">
           <h2>類別統計</h2>
           <div class="note">依目前行程統計各類別花費總和；不同幣別不換算，分幣別列出。</div>
           <div id="categoryStatsList" class="list"></div>
         </div>
         <div class="card">
-          <h2>HTML／列印輸出</h2>
+          <h2>列印／HTML 輸出設定</h2>
           <div class="note">輸出單一行程的清爽版 HTML，可直接列印或另存 PDF。版面改用深色大字，並可自行選擇列印範圍，避免兩天資料就印出十幾頁。</div>
           <div class="grid two">
             <div><label for="reportTripSelect">列印行程</label><select id="reportTripSelect"></select></div>
@@ -327,9 +347,23 @@
             <button class="btn secondary full" id="exportTripHtmlBtn">匯出單一行程 HTML</button>
           </div>
         </div>
+      </section>
+
+      <section class="page" id="page-data">
+        <div class="card">
+          <h2>JSON 備份</h2>
+          <div class="grid two">
+            <button class="btn secondary full" id="exportAllBtn">匯出全部行程 JSON</button>
+            <button class="btn secondary full" id="exportTripBtn">匯出目前行程 JSON</button>
+          </div>
+          <label class="btn secondary full" style="text-align:center;display:flex;align-items:center;justify-content:center;margin-top:10px">匯入 JSON 備份<input id="importFile" type="file" accept="application/json,.json" style="display:none"></label>
+          <p class="hint">換手機、換瀏覽器或清除瀏覽資料前，請先匯出備份。</p>
+          <div id="downloadNotice" class="note" style="display:none;margin-top:10px"></div>
+        </div>
         <div class="card">
           <h2>更新記錄</h2>
           <div class="list">
+            <div class="item"><div class="item-title">V1.4.4｜結算列印中心</div><div class="item-meta">新增「結算列印」獨立功能頁，集中顯示結算摘要、每人收支、類別統計與列印／HTML 輸出設定，避免結算與分類散在不同分頁。</div></div>
             <div class="item"><div class="item-title">V1.4.3｜統一幣別結算</div><div class="item-meta">結算頁新增「原幣別分開／統一幣別」選項；使用者可自選統一幣別並自行輸入匯率，結算摘要與 HTML／列印輸出會依設定顯示。</div></div>
             <div class="item"><div class="item-title">V1.4.2｜類別統計</div><div class="item-meta">新增「類別統計」，依類別彙總各幣別花費總和；HTML／列印輸出可選擇是否包含類別統計。</div></div>
             <div class="item"><div class="item-title">V1.4.1｜HTML／列印輸出強化</div><div class="item-meta">新增單一行程 HTML 輸出、列印單一行程、排序依據與列印範圍選項；列印版改用深色大字，避免 PDF 字太小太淡，也能減少頁數。</div></div>
@@ -375,7 +409,7 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.3',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.4',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
   let payerMode = 'person';
   let shareMode = 'equal';
@@ -453,14 +487,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.3',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.4',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.3',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.4',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -679,7 +713,7 @@
   function sortByDate(a,b){ return (a.date||'').localeCompare(b.date||'') || (a.createdAt||'').localeCompare(b.createdAt||''); }
   function sortDesc(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''); }
 
-  function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlementOptions(); renderSettlement(); renderCategoryStats(); }
+  function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlementOptions(); renderSettlement(); renderReportSettlementOptions(); renderReportCenter(); renderCategoryStats(); }
   function renderTripSelect(){
     const sel=$('currentTripSelect'); const current=state.currentTripId; sel.innerHTML='';
     state.trips.forEach(t => sel.append(el('option',{value:t.id,text:t.name})));
@@ -1022,6 +1056,74 @@
     });
     if(!hasRem) remBox.append(el('div',{class:'empty',text:'現金池沒有剩餘歸屬。'}));
   }
+
+  function renderReportSettlementOptions(){
+    const t = trip(); const settings = settlementSettings(t);
+    const targetSel = $('reportSettlementTargetCurrency');
+    if(!targetSel) return;
+    const target = settings.target;
+    $('reportSettlementSeparateMode')?.classList.toggle('active', settings.mode !== 'unified');
+    $('reportSettlementUnifiedMode')?.classList.toggle('active', settings.mode === 'unified');
+    targetSel.innerHTML = '';
+    Object.entries(currencies).forEach(([code,info]) => targetSel.append(el('option',{value:code,text:`${info.name} ${code}`})));
+    targetSel.value = target;
+    const box = $('reportUnifiedSettlementBox');
+    if(box) box.style.display = settings.mode === 'unified' ? 'block' : 'none';
+    const list = $('reportSettlementRateList');
+    if(!list) return;
+    list.innerHTML = '';
+    Object.entries(currencies).forEach(([code,info]) => {
+      const disabled = code === target;
+      const input = el('input',{type:'number',step:'0.000001',min:'0',inputmode:'decimal',value:disabled?1:(settings.rates[code]||''),placeholder:disabled?'1':'自行輸入'});
+      if(disabled) input.setAttribute('disabled','disabled');
+      input.addEventListener('change',()=>{
+        const curTrip = trip(); const s = settlementSettings(curTrip);
+        const v = Number(input.value);
+        s.rates[code] = code === s.target ? 1 : (v > 0 ? v : '');
+        curTrip.settlementRates = s.rates;
+        saveState();
+        toast('已更新匯率設定');
+      });
+      list.append(el('div',{},[
+        el('label',{text:`1 ${info.name} ${code} = 多少 ${currencies[target].name} ${target}`}),
+        input
+      ]));
+    });
+    const hint = $('reportSettlementRateHint');
+    if(hint) hint.textContent = `目前統一幣別：${currencies[target].name} ${target}。原始支出仍保留原幣別，只有結算摘要與列印摘要會換算。`;
+  }
+  function renderReportCenter(){
+    const t=trip(); const settings=settlementSettings(t); const computed=compute(t);
+    const settleBox=$('reportSettlementPreview'); const balBox=$('reportBalancesPreview');
+    if(!settleBox || !balBox) return;
+    settleBox.innerHTML=''; balBox.innerHTML='';
+    if(!t.expenses.length && !t.poolContributions.length){
+      settleBox.append(el('div',{class:'empty',text:'有支出後，這裡會自動產生結算摘要。'}));
+      balBox.append(el('div',{class:'empty',text:'尚無收支。'}));
+      return;
+    }
+    if(settings.mode === 'unified'){
+      renderUnifiedSettlement(t, computed, settleBox);
+    }else{
+      let hasSettlement=false;
+      Object.entries(currencies).forEach(([cur,info])=>{
+        const items=computed.settlements[cur]||[]; const shortage=computed.poolShortage[cur]||0;
+        if(!items.length && isZero(shortage,cur)) return;
+        hasSettlement=true; const block=el('div',{class:'currency-block'},[el('div',{class:'currency-title',text:info.name + '結算'})]);
+        if(items.length){ items.forEach(s=>block.append(el('div',{class:'settle'},[el('strong',{text:personName(s.from,t)}),document.createTextNode(' 轉給 '),el('strong',{text:personName(s.to,t)}),document.createTextNode(' '),el('strong',{text:money(s.amount,cur)})]))); }
+        if(!isZero(shortage,cur)) block.append(el('div',{class:'warn',text:`現金池不足 ${money(shortage,cur)}，請先補登現金池出資，否則這個幣別結算不完整。`}));
+        settleBox.append(block);
+      });
+      if(!hasSettlement) settleBox.append(el('div',{class:'empty',text:'目前各幣別都已打平，不需要轉帳。'}));
+    }
+    const unified = settings.mode === 'unified' ? computeUnifiedSettlement(t,computed) : null;
+    t.people.forEach(p=>{
+      const parts=[]; Object.keys(currencies).forEach(cur=>{ const b=computed.balances[p.id]?.[cur]; if(!b) return; const bal=roundCurrency(b.balance,cur); if(!isZero(b.paid,cur)||!isZero(b.owed,cur)||!isZero(bal,cur)) parts.push(`${currencies[cur].name}：先付 ${money(b.paid,cur)}｜分攤 ${money(b.owed,cur)}｜${bal>=0?'應收':'應付'} ${money(Math.abs(bal),cur)}`); });
+      if(unified && !unified.missing.length){ const ub=roundCurrency(unified.totals[p.id]||0, unified.target); if(!isZero(ub,unified.target)) parts.push(`統一後：${ub>=0?'應收':'應付'} ${money(Math.abs(ub),unified.target)}`); }
+      balBox.append(el('div',{class:'balance'},[el('div',{},[el('div',{class:'name',text:p.name}), el('div',{class:'desc',text:parts.join('；') || '尚無紀錄'})])]));
+    });
+  }
+
   function resetExpenseForm(){ $('expenseDate').value=todayISO(); $('expenseTitle').value=''; $('expenseAmount').value=''; $('expenseCurrency').value='TWD'; $('expenseCategory').value='餐食'; $('expenseReceiptUrl').value=''; $('expenseNote').value=''; payerMode='person'; shareMode='equal'; setExpenseEditMode(null); renderExpenseForm(); }
   function resetPoolForm(){ $('poolDate').value=todayISO(); $('poolAmount').value=''; $('poolCurrency').value='TWD'; $('poolNote').value=''; setPoolEditMode(null); }
   function resetLinkForm(){ $('linkDate').value=todayISO(); $('linkTitle').value=''; $('linkUrl').value=''; $('linkNote').value=''; $('linkType').value='收據'; setLinkEditMode(null); }
@@ -1137,7 +1239,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.3｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.4｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1290,6 +1392,10 @@
   $('settlementSeparateMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='separate'; saveState(); toast('已改為原幣別分開結算'); });
   $('settlementUnifiedMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='unified'; settlementSettings(t); saveState(); toast('已改為統一幣別結算'); });
   $('settlementTargetCurrency')?.addEventListener('change',e=>{ const t=trip(); t.settlementTarget=e.target.value; t.settlementRates=defaultSettlementRates(t.settlementTarget); saveState(); toast('已更新統一幣別，請重新輸入匯率'); });
+  $('reportSettlementSeparateMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='separate'; saveState(); render(); toast('已改為原幣別分開結算'); });
+  $('reportSettlementUnifiedMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='unified'; settlementSettings(t); saveState(); render(); toast('已改為統一幣別結算'); });
+  $('reportSettlementTargetCurrency')?.addEventListener('change',e=>{ const t=trip(); t.settlementTarget=e.target.value; t.settlementRates=defaultSettlementRates(t.settlementTarget); saveState(); render(); toast('已更新統一幣別，請重新輸入匯率'); });
+  $('copyReportSettlementBtn')?.addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
   $('copySettlementBtn').addEventListener('click',async()=>{ const text=settlementText(); try{ await navigator.clipboard.writeText(text); toast('已複製結算文字'); }catch(err){ const area=document.createElement('textarea'); area.value=text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); toast('已複製結算文字'); } });
   $('exportAllBtn').addEventListener('click',()=>exportJSON(state,`米兔分帳全部行程_${todayISO()}.json`));
   $('exportTripBtn').addEventListener('click',()=>exportJSON({app:state.app,version:state.version,trip:trip()},`米兔分帳_${trip().name}_${todayISO()}.json`));
@@ -1297,7 +1403,7 @@
   $('exportTripHtmlBtn')?.addEventListener('click',exportTripHTML);
   document.querySelectorAll('#reportScopeBox input').forEach(input=>input.addEventListener('change',updateReportScopePills));
   updateReportScopePills();
-  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.3',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
+  $('importFile').addEventListener('change',async e=>{ const file=e.target.files?.[0]; if(!file) return; try{ const data=JSON.parse(await file.text()); if(Array.isArray(data.trips)){ state={app:'米兔分帳小幫手',version:'1.4.4',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)}; if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id; } else if(data.trip){ const imported=normalizeTrip(data.trip); state.trips.push(imported); state.currentTripId=imported.id; } else if(Array.isArray(data.people) && Array.isArray(data.expenses)){ const imported=normalizeTrip({name:'匯入行程',people:data.people,expenses:data.expenses}); state.trips.push(imported); state.currentTripId=imported.id; } else { throw new Error('format'); } if(!state.trips.length) throw new Error('empty'); saveState(); toast('已匯入 JSON'); }catch(err){ toast('匯入失敗，檔案格式不正確'); } finally{ e.target.value=''; } });
   $('deleteTripBtn').addEventListener('click',()=>deleteTripById(trip().id));
   $('wipeBtn').addEventListener('click',()=>{ if(confirm('確定清除所有行程與資料？這個動作不能復原。')){ localStorage.removeItem(STORAGE_KEY); state=defaultState(); resetExpenseForm(); resetPoolForm(); resetLinkForm(); saveState(); toast('已清除資料'); } });
 
