@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.8</title>
+  <title>米兔分帳小幫手 V1.4.9</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.8</div>
+        <div class="version">V1.4.9</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -113,21 +113,35 @@
         <div class="card">
           <h2>行程分帳</h2>
           <div class="note">每個行程都有自己的旅伴、支出、現金池、收據與票券連結。例如：大邱三日行、廣島遊可以完全分開。</div>
-          <div class="row">
-            <input id="newTripName" class="grow" type="text" placeholder="新增行程，例如：大邱三日行">
-            <button class="btn" id="addTripBtn">新增</button>
+          <div class="grid three">
+            <div>
+              <label for="newTripName">行程名稱</label>
+              <input id="newTripName" type="text" placeholder="新增行程，例如：大邱三日行">
+            </div>
+            <div>
+              <label for="newTripYear">年份</label>
+              <select id="newTripYear"></select>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn full" id="addTripBtn">新增</button>
+            </div>
           </div>
         </div>
         <div class="card">
           <h2>目前行程設定</h2>
-          <div class="grid two">
+          <div class="grid three">
             <div>
               <label for="tripNameEdit">行程名稱</label>
               <input id="tripNameEdit" type="text">
             </div>
             <div>
+              <label for="tripYearEdit">年份</label>
+              <select id="tripYearEdit"></select>
+            </div>
+            <div>
               <label>&nbsp;</label>
-              <button class="btn secondary full" id="renameTripBtn">儲存名稱</button>
+              <button class="btn secondary full" id="renameTripBtn">儲存名稱／年份</button>
             </div>
           </div>
           <div class="grid three no-print" style="margin-top:10px">
@@ -138,7 +152,17 @@
         </div>
         <div class="card">
           <h2>行程列表</h2>
-          <div id="tripList" class="list"></div>
+          <div class="grid two">
+            <div>
+              <label for="tripYearFilter">年份篩選</label>
+              <select id="tripYearFilter"></select>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <div class="note" id="tripYearFilterNote" style="margin:0">依行程年份收合清單，避免行程太多不好找。</div>
+            </div>
+          </div>
+          <div id="tripList" class="list" style="margin-top:10px"></div>
         </div>
         <div class="card">
           <h2>最近支出</h2>
@@ -364,6 +388,7 @@
           <details id="updateLogDetails">
             <summary style="cursor:pointer;font-weight:950;color:var(--brand2);font-size:1.02rem">更新記錄 <span class="hint">（點開查看版本變更）</span></summary>
             <div class="list" style="margin-top:10px">
+              <div class="item"><div class="item-title">V1.4.9｜行程列表年份篩選</div><div class="item-meta">新增行程年份欄位，新增與編輯行程時可指定年份；行程列表可依年份篩選，避免行程累積太多不好找。</div></div>
               <div class="item"><div class="item-title">V1.4.8｜更新記錄折疊與同名匯入處理</div><div class="item-meta">更新記錄改為預設折疊，資料頁更清爽。匯入單一行程 JSON 時若偵測到同名或同 ID 行程，會讓使用者選擇覆蓋原行程、另存副本或取消匯入；匯入全部行程備份前會先確認，避免誤覆蓋。</div></div>
             <div class="item"><div class="item-title">V1.4.7｜帳簿頁單項編輯</div><div class="item-meta">帳簿頁明細表新增「操作」欄，可直接從個人帳簿編輯相關支出或現金池出資紀錄，不必再回到費用列表尋找。</div></div>
             <div class="item"><div class="item-title">V1.4.6｜統一幣別支出明細</div><div class="item-meta">若結算方式選「統一幣別」，列印／HTML 輸出的支出明細金額也同步換算成統一幣別；原金額以小字括註，避免與結算摘要和類別統計混淆。</div></div>
@@ -407,6 +432,40 @@
   const OLD_STORAGE_KEY = 'mituTravelSplit.v1';
   const todayISO = () => new Date().toISOString().slice(0,10);
   const newId = () => (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  const currentYear = () => new Date().getFullYear();
+  function inferTripYear(t){
+    const dates = [];
+    (t?.expenses||[]).forEach(e=>{ if(e.date) dates.push(e.date); });
+    (t?.poolContributions||[]).forEach(e=>{ if(e.date) dates.push(e.date); });
+    (t?.links||[]).forEach(e=>{ if(e.date) dates.push(e.date); });
+    if(dates.length){
+      const y = String(dates.sort()[0]).slice(0,4);
+      if(/^\d{4}$/.test(y)) return Number(y);
+    }
+    const created = t?.createdAt || '';
+    const y2 = String(created).slice(0,4);
+    return /^\d{4}$/.test(y2) ? Number(y2) : currentYear();
+  }
+  function normalizeTripYear(year, t){
+    const y = Number(year);
+    if(y >= 1900 && y <= 2200) return y;
+    return inferTripYear(t);
+  }
+  function tripYears(){
+    const ys = new Set([currentYear()]);
+    (state?.trips||[]).forEach(t=>ys.add(normalizeTripYear(t.year,t)));
+    for(let y=currentYear()-1; y<=currentYear()+2; y++) ys.add(y);
+    return [...ys].sort((a,b)=>b-a);
+  }
+  function fillYearSelect(select, value, includeAll=false){
+    if(!select) return;
+    const prev = value ?? select.value;
+    select.innerHTML='';
+    if(includeAll) select.append(el('option',{value:'all',text:'全部年份'}));
+    tripYears().forEach(y=>select.append(el('option',{value:String(y),text:String(y)})));
+    if([...select.options].some(o=>o.value===String(prev))) select.value=String(prev);
+    else select.value = includeAll ? 'all' : String(currentYear());
+  }
   const currencies = {
     TWD:{name:'台幣',symbol:'NT$',decimals:0}, JPY:{name:'日圓',symbol:'¥',decimals:0},
     KRW:{name:'韓幣',symbol:'₩',decimals:0}, USD:{name:'美金',symbol:'US$',decimals:2}
@@ -414,9 +473,10 @@
   const categories = ['餐食','交通','門票','住宿','購物','票券','其他'];
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
-  const makeTrip = (name='未命名行程') => ({id:newId(),name,people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.8',currentTripId:trip.id,trips:[trip]}; };
+  const makeTrip = (name='未命名行程', year=currentYear()) => ({id:newId(),name,year:normalizeTripYear(year),people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.9',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
+  state.version = '1.4.9';
   let payerMode = 'person';
   let shareMode = 'equal';
   let editingExpenseId = null;
@@ -466,7 +526,7 @@
 
   function normalizeTrip(t){
     return {
-      id:t.id || newId(), name:t.name || '未命名行程',
+      id:t.id || newId(), name:t.name || '未命名行程', year:normalizeTripYear(t.year,t),
       people:Array.isArray(t.people) && t.people.length ? t.people.map(p=>({id:p.id||newId(),name:p.name||'未命名'})) : defaultPeople(),
       expenses:Array.isArray(t.expenses) ? t.expenses.map(ex=>({
         id:ex.id||newId(), createdAt:ex.createdAt||new Date().toISOString(), date:ex.date||todayISO(), title:ex.title||'未命名項目',
@@ -493,14 +553,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.8',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.9',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.8',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.9',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -722,9 +782,11 @@
   function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlementOptions(); renderSettlement(); renderReportSettlementOptions(); renderReportCenter(); renderCategoryStats(); }
   function renderTripSelect(){
     const sel=$('currentTripSelect'); const current=state.currentTripId; sel.innerHTML='';
-    state.trips.forEach(t => sel.append(el('option',{value:t.id,text:t.name})));
+    state.trips.forEach(t => sel.append(el('option',{value:t.id,text:`${normalizeTripYear(t.year,t)}｜${t.name}`})));
     sel.value = current;
     $('tripNameEdit').value = trip().name;
+    fillYearSelect($('newTripYear'), $('newTripYear')?.value || currentYear());
+    fillYearSelect($('tripYearEdit'), normalizeTripYear(trip().year, trip()));
   }
   function renderStatusbar(){
     const t=trip(); const pool=compute(t).poolRemainder; const activePool = Object.entries(pool).filter(([,v])=>!isZero(v.total,'TWD')).length;
@@ -733,17 +795,27 @@
   }
   function renderTrips(){
     const box=$('tripList'); box.innerHTML='';
-    state.trips.forEach(t => {
+    fillYearSelect($('tripYearFilter'), $('tripYearFilter')?.value || 'all', true);
+    const filter = $('tripYearFilter')?.value || 'all';
+    const list = state.trips.filter(t => filter==='all' || String(normalizeTripYear(t.year,t))===String(filter));
+    if($('tripYearFilterNote')) $('tripYearFilterNote').textContent = filter==='all' ? `全部年份，共 ${state.trips.length} 個行程` : `${filter} 年，共 ${list.length} 個行程`;
+    if(!list.length){ box.append(el('div',{class:'item'},[el('div',{class:'item-title',text:'這個年份目前沒有行程'})])); return; }
+    list.forEach(t => {
       const isCurrent = t.id===state.currentTripId;
       const input = el('input',{class:'trip-name-input',type:'text',value:t.name,'aria-label':'行程名稱'});
-      const saveName = el('button',{class:'btn secondary small',text:'儲存名稱'});
+      const yearSelect = el('select',{'aria-label':'行程年份'});
+      tripYears().forEach(y=>yearSelect.append(el('option',{value:String(y),text:String(y)})));
+      yearSelect.value = String(normalizeTripYear(t.year,t));
+      const saveName = el('button',{class:'btn secondary small',text:'儲存名稱／年份'});
       const commitName = () => {
         const name = input.value.trim();
         if(!name){ input.value=t.name; return toast('行程名稱不可空白'); }
-        if(name===t.name) return toast('名稱沒有變更');
+        const year = Number(yearSelect.value) || currentYear();
+        if(name===t.name && year===normalizeTripYear(t.year,t)) return toast('名稱／年份沒有變更');
         t.name = name;
+        t.year = year;
         saveState();
-        toast('已更新行程名稱');
+        toast('已更新行程名稱／年份');
       };
       input.addEventListener('keydown',e=>{ if(e.key==='Enter') commitName(); });
       saveName.addEventListener('click',commitName);
@@ -754,8 +826,11 @@
       box.append(el('div',{class:'item'},[
         el('div',{class:'item-top'},[
           el('div',{class:'grow'},[
-            input,
-            el('div',{class:'item-meta',text:`旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})
+            el('div',{class:'grid two'},[
+              el('div',{},[el('label',{text:'行程名稱'}), input]),
+              el('div',{},[el('label',{text:'年份'}), yearSelect])
+            ]),
+            el('div',{class:'item-meta',text:`${normalizeTripYear(t.year,t)} 年｜旅伴 ${t.people.length} 人｜支出 ${t.expenses.length} 筆｜現金池 ${t.poolContributions.length} 筆｜連結 ${t.links.length} 個`})
           ]),
           el('div',{class:'row wrap'},[btn,saveName,del])
         ])
@@ -1366,7 +1441,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.8｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.9｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1500,10 +1575,11 @@
   document.querySelectorAll('[data-jump]').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.jump)));
   function switchTab(tab){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab)); document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${tab}`)); window.scrollTo({top:0,behavior:'smooth'}); }
 
+  $('tripYearFilter')?.addEventListener('change',()=>renderTrips());
   $('currentTripSelect').addEventListener('change',e=>{state.currentTripId=e.target.value; saveState(); toast('已切換行程');});
-  $('addTripBtn').addEventListener('click',()=>{ const name=$('newTripName').value.trim(); if(!name) return toast('請輸入行程名稱'); const t=makeTrip(name); state.trips.push(t); state.currentTripId=t.id; $('newTripName').value=''; saveState(); toast('已新增行程'); });
+  $('addTripBtn').addEventListener('click',()=>{ const name=$('newTripName').value.trim(); if(!name) return toast('請輸入行程名稱'); const year=Number($('newTripYear')?.value)||currentYear(); const t=makeTrip(name,year); state.trips.push(t); state.currentTripId=t.id; $('newTripName').value=''; saveState(); toast('已新增行程'); });
   $('newTripName').addEventListener('keydown',e=>{if(e.key==='Enter') $('addTripBtn').click();});
-  $('renameTripBtn').addEventListener('click',()=>{ const name=$('tripNameEdit').value.trim(); if(!name) return toast('行程名稱不可空白'); trip().name=name; saveState(); toast('已更新行程名稱'); });
+  $('renameTripBtn').addEventListener('click',()=>{ const name=$('tripNameEdit').value.trim(); if(!name) return toast('行程名稱不可空白'); const t=trip(); t.name=name; t.year=Number($('tripYearEdit')?.value)||normalizeTripYear(t.year,t); saveState(); toast('已更新行程名稱／年份'); });
   $('addPersonBtn').addEventListener('click',()=>{ const name=$('personName').value.trim(); const t=trip(); if(!name) return toast('請先輸入旅伴姓名'); if(t.people.some(p=>p.name===name)) return toast('這個名字已經存在'); t.people.push({id:newId(),name}); $('personName').value=''; saveState(); toast('已新增旅伴'); });
   $('personName').addEventListener('keydown',e=>{if(e.key==='Enter') $('addPersonBtn').click();});
   $('savePoolBtn').addEventListener('click',()=>{ const t=trip(); const amount=Number($('poolAmount').value); const personId=$('poolPerson').value; if(!personId) return toast('請先新增旅伴'); if(!amount||amount<=0) return toast('請輸入正確金額'); const data={date:$('poolDate').value||todayISO(),personId,amount,currency:$('poolCurrency').value,note:$('poolNote').value.trim()}; if(editingPoolId){ const rec=t.poolContributions.find(x=>x.id===editingPoolId); if(!rec) return toast('找不到要更新的現金池紀錄'); Object.assign(rec,data); saveState(); resetPoolForm(); toast('已更新現金池紀錄'); } else { t.poolContributions.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetPoolForm(); toast('已加入現金池'); } });
@@ -1595,7 +1671,7 @@
       if(Array.isArray(data.trips)){
         const ok = confirm('這是「全部行程」JSON。匯入後會覆蓋目前所有行程與資料。\n\n確定要繼續嗎？');
         if(!ok){ toast('已取消匯入'); return; }
-        state={app:'米兔分帳小幫手',version:'1.4.8',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)};
+        state={app:'米兔分帳小幫手',version:'1.4.9',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)};
         if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id;
         message='已匯入全部行程，並覆蓋原資料';
       } else if(data.trip){
