@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="米兔分帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>米兔分帳小幫手 V1.4.9</title>
+  <title>米兔分帳小幫手 V1.4.10</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -81,7 +81,7 @@
             <p class="subtitle">用行程分開管理，原幣別記帳，也可統一幣別結算與列印。</p>
           </div>
         </div>
-        <div class="version">V1.4.9</div>
+        <div class="version">V1.4.10</div>
       </div>
       <div class="tripbar no-print">
         <div>
@@ -237,7 +237,11 @@
           </div>
           <div id="expenseEditBanner" class="edit-banner" style="display:none">正在編輯既有支出</div><div class="grid three" style="margin-top:12px"><button class="btn full" id="saveExpenseBtn">儲存這一筆</button><button class="btn secondary full" id="resetExpenseFormBtn">清空表單</button><button class="btn secondary full" id="cancelExpenseEditBtn" style="display:none">取消編輯</button></div>
         </div>
-        <div class="card"><h2>費用列表</h2><div id="expensesList" class="list"></div></div>
+        <div class="card"><h2>費用列表</h2>
+          <div class="grid two no-print" style="margin-bottom:10px">
+            <div><label for="expenseListSort">日期排序</label><select id="expenseListSort"><option value="desc">日期新到舊</option><option value="asc">日期舊到新</option></select></div>
+          </div>
+          <div id="expensesList" class="list"></div></div>
       </section>
 
       <section class="page" id="page-search">
@@ -269,9 +273,10 @@
         <div class="card">
           <h2>個人支出總覽</h2>
           <div class="note">這頁當一般帳簿使用：看每個人在本行程中「自己先付多少、現金池出資多少、個人實際分攤消費多少」。它不是最後轉帳結算，最後誰付誰仍看「結算」分頁。</div>
-          <div class="grid two">
+          <div class="grid three">
             <div><label for="ledgerPerson">查看對象</label><select id="ledgerPerson"></select></div>
             <div><label for="ledgerCurrency">幣別</label><select id="ledgerCurrency"></select></div>
+            <div><label for="ledgerSort">日期排序</label><select id="ledgerSort"><option value="desc">日期新到舊</option><option value="asc">日期舊到新</option></select></div>
           </div>
           <div id="ledgerList" style="margin-top:12px"></div>
         </div>
@@ -388,6 +393,7 @@
           <details id="updateLogDetails">
             <summary style="cursor:pointer;font-weight:950;color:var(--brand2);font-size:1.02rem">更新記錄 <span class="hint">（點開查看版本變更）</span></summary>
             <div class="list" style="margin-top:10px">
+              <div class="item"><div class="item-title">V1.4.10｜帳目列日期排序</div><div class="item-meta">記一筆的費用列表與帳簿頁明細表新增「日期排序」，可切換日期新到舊或日期舊到新。</div></div>
               <div class="item"><div class="item-title">V1.4.9｜行程列表年份篩選</div><div class="item-meta">新增行程年份欄位，新增與編輯行程時可指定年份；行程列表可依年份篩選，避免行程累積太多不好找。</div></div>
               <div class="item"><div class="item-title">V1.4.8｜更新記錄折疊與同名匯入處理</div><div class="item-meta">更新記錄改為預設折疊，資料頁更清爽。匯入單一行程 JSON 時若偵測到同名或同 ID 行程，會讓使用者選擇覆蓋原行程、另存副本或取消匯入；匯入全部行程備份前會先確認，避免誤覆蓋。</div></div>
             <div class="item"><div class="item-title">V1.4.7｜帳簿頁單項編輯</div><div class="item-meta">帳簿頁明細表新增「操作」欄，可直接從個人帳簿編輯相關支出或現金池出資紀錄，不必再回到費用列表尋找。</div></div>
@@ -474,9 +480,9 @@
   const linkTypes = ['收據','票券','訂房','交通','雲端相簿','其他'];
   const defaultPeople = () => [{id:newId(),name:'米兔'},{id:newId(),name:'Rita'}];
   const makeTrip = (name='未命名行程', year=currentYear()) => ({id:newId(),name,year:normalizeTripYear(year),people:defaultPeople(),expenses:[],poolContributions:[],links:[],settlementMode:'separate',settlementTarget:'TWD',settlementRates:defaultSettlementRates('TWD')});
-  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.9',currentTripId:trip.id,trips:[trip]}; };
+  const defaultState = () => { const trip = makeTrip('大邱三日行'); return {app:'米兔分帳小幫手',version:'1.4.10',currentTripId:trip.id,trips:[trip]}; };
   let state = loadState();
-  state.version = '1.4.9';
+  state.version = '1.4.10';
   let payerMode = 'person';
   let shareMode = 'equal';
   let editingExpenseId = null;
@@ -553,14 +559,14 @@
       if(saved && Array.isArray(saved.trips)){
         const trips = saved.trips.map(normalizeTrip).filter(t=>t.id);
         const currentTripId = trips.some(t=>t.id===saved.currentTripId) ? saved.currentTripId : trips[0]?.id;
-        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.9',...saved,trips,currentTripId};
+        if(trips.length) return {app:'米兔分帳小幫手',version:'1.4.10',...saved,trips,currentTripId};
       }
     }catch(err){ console.warn(err); }
     try{
       const old = JSON.parse(localStorage.getItem(OLD_STORAGE_KEY));
       if(old && Array.isArray(old.people) && Array.isArray(old.expenses)){
         const trip = normalizeTrip({name:'舊版匯入行程',people:old.people,expenses:old.expenses.map(e=>({...e,payerType:'person',category:'其他',receiptUrl:''}))});
-        return {app:'米兔分帳小幫手',version:'1.4.9',currentTripId:trip.id,trips:[trip]};
+        return {app:'米兔分帳小幫手',version:'1.4.10',currentTripId:trip.id,trips:[trip]};
       }
     }catch(err){ console.warn(err); }
     return defaultState();
@@ -778,6 +784,7 @@
 
   function sortByDate(a,b){ return (a.date||'').localeCompare(b.date||'') || (a.createdAt||'').localeCompare(b.createdAt||''); }
   function sortDesc(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''); }
+  function sortByDateChoice(list, choice){ return list.sort(choice === 'asc' ? sortByDate : sortDesc); }
 
   function render(){ renderTripSelect(); renderReportOptions(); renderStatusbar(); renderTrips(); renderPeople(); renderPool(); renderExpenseForm(); renderExpenses(); renderSearch(); renderLedger(); renderLinks(); renderSettlementOptions(); renderSettlement(); renderReportSettlementOptions(); renderReportCenter(); renderCategoryStats(); }
   function renderTripSelect(){
@@ -995,7 +1002,7 @@
     return node;
   }
   function renderExpenses(){
-    const box=$('expensesList'); box.innerHTML=''; const sorted=[...trip().expenses].sort(sortDesc);
+    const box=$('expensesList'); box.innerHTML=''; const sorted=sortByDateChoice([...trip().expenses], $('expenseListSort')?.value || 'desc');
     if(!sorted.length){ box.append(el('div',{class:'empty',text:'費用會列在這裡。'})); return; }
     sorted.forEach(ex=>box.append(expenseItem(ex,true)));
   }
@@ -1073,7 +1080,7 @@
     const computed=compute(t); const people = selectedPerson ? t.people.filter(p=>p.id===selectedPerson) : t.people;
     people.forEach(person=>{
       const ledger = buildLedgerForPerson(t, person, computed);
-      const curEntries = selectedCurrency ? ledger.entries.filter(e=>e.currency===selectedCurrency) : ledger.entries;
+      const curEntries = sortByDateChoice(selectedCurrency ? ledger.entries.filter(e=>e.currency===selectedCurrency) : [...ledger.entries], $('ledgerSort')?.value || 'desc');
       const currencyCodes = selectedCurrency ? [selectedCurrency] : Object.keys(currencies);
       const totalCards=[];
       currencyCodes.forEach(cur=>{
@@ -1441,7 +1448,7 @@
     const includeLinks = reportOption('reportIncludeLinks');
     const includeNotes = reportOption('reportIncludeNotes');
     const now = new Date().toLocaleString('zh-TW',{hour12:false});
-    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.9｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
+    let body = `<div class="wrap"><h1>${htmlEscape(t.name)}｜米兔分帳列印版</h1><div class="meta">產生時間：${htmlEscape(now)}｜版本：V1.4.10｜排序：${htmlEscape($('reportSort')?.selectedOptions?.[0]?.textContent || '')}</div>`;
     body += section('行程摘要', `<div class="summary"><div class="box"><div class="label">旅伴</div><div class="value">${t.people.length} 人</div></div><div class="box"><div class="label">支出</div><div class="value">${t.expenses.length} 筆</div></div><div class="box"><div class="label">現金池</div><div class="value">${t.poolContributions.length} 筆</div></div><div class="box"><div class="label">連結</div><div class="value">${t.links.length} 個</div></div></div>`);
     if(includeSettlement){
       let html = ''; let has = false;
@@ -1610,7 +1617,8 @@
   });
   $('resetExpenseFormBtn').addEventListener('click',resetExpenseForm); $('cancelExpenseEditBtn').addEventListener('click',cancelExpenseEdit); $('cancelPoolEditBtn').addEventListener('click',cancelPoolEdit); $('cancelLinkEditBtn').addEventListener('click',cancelLinkEdit);
   $('searchDate').addEventListener('change',renderSearch); $('searchKeyword').addEventListener('input',renderSearch);
-  $('ledgerPerson').addEventListener('change',renderLedger); $('ledgerCurrency').addEventListener('change',renderLedger);
+  $('expenseListSort')?.addEventListener('change',renderExpenses);
+  $('ledgerPerson').addEventListener('change',renderLedger); $('ledgerCurrency').addEventListener('change',renderLedger); $('ledgerSort')?.addEventListener('change',renderLedger);
   $('saveLinkBtn').addEventListener('click',()=>{ const t=trip(); const title=$('linkTitle').value.trim(); const url=$('linkUrl').value.trim(); if(!title) return toast('請輸入連結名稱'); if(!url || !validUrl(url)) return toast('請輸入 http 或 https 開頭的連結'); const data={date:$('linkDate').value||todayISO(),type:$('linkType').value,title,url,note:$('linkNote').value.trim()}; if(editingLinkId){ const rec=t.links.find(x=>x.id===editingLinkId); if(!rec) return toast('找不到要更新的連結'); Object.assign(rec,data); saveState(); resetLinkForm(); toast('已更新連結'); } else { t.links.push({id:newId(),createdAt:new Date().toISOString(),...data}); saveState(); resetLinkForm(); toast('已儲存連結'); } });
   $('settlementSeparateMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='separate'; saveState(); toast('已改為原幣別分開結算'); });
   $('settlementUnifiedMode')?.addEventListener('click',()=>{ const t=trip(); t.settlementMode='unified'; settlementSettings(t); saveState(); toast('已改為統一幣別結算'); });
@@ -1671,7 +1679,7 @@
       if(Array.isArray(data.trips)){
         const ok = confirm('這是「全部行程」JSON。匯入後會覆蓋目前所有行程與資料。\n\n確定要繼續嗎？');
         if(!ok){ toast('已取消匯入'); return; }
-        state={app:'米兔分帳小幫手',version:'1.4.9',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)};
+        state={app:'米兔分帳小幫手',version:'1.4.10',currentTripId:data.currentTripId,trips:data.trips.map(normalizeTrip)};
         if(!state.trips.some(t=>t.id===state.currentTripId)) state.currentTripId=state.trips[0]?.id;
         message='已匯入全部行程，並覆蓋原資料';
       } else if(data.trip){

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mitu-travel-split-v1-4-9-trip-year-filter';
+const CACHE_NAME = 'mitu-travel-split-v1-4-10-date-sort';
 const ASSETS = [
   './',
   './index.html',
